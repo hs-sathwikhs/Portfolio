@@ -337,7 +337,7 @@ const Experience = () => {
       location: 'Bengaluru, India',
       date: 'Jun2025 - Present',
       description: 'Working as a Research Intern working in the domain of Blockchain. Developing a web applications for creating and claiming certificates for courses and programs as NFTs to protect the authenticity of the certificates.',
-      skills: ['Solidity', 'Blockchain', 'React', 'JavaScript', 'Node.js'],
+      skills: ['Solidity', 'Blockchain', 'React', 'JavaScript'],
       link: 'https://www.isfcr.pes.edu/'
     }
   ];
