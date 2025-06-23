@@ -589,7 +589,7 @@ const Contact = () => {
             name="name"
                       value={formData.name}
             onChange={handleChange}
-                      placeholder="John Doe"
+                      placeholder="Full Name"
             required
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -613,7 +613,7 @@ const Contact = () => {
             name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="john@example.com"
+                      placeholder="mail@example.com"
                       required
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}

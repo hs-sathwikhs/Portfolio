@@ -149,75 +149,57 @@ const TimelineContainer = styled(motion.div)`
 
 const TimelineItem = styled(motion.div)`
   display: flex;
-  justify-content: flex-end;
-  padding-right: 30px;
+  justify-content: ${({ side }) => side === 'left' ? 'flex-end' : 'flex-start'};
+  padding-right: ${({ side }) => side === 'left' ? '30px' : '0'};
+  padding-left: ${({ side }) => side === 'right' ? '30px' : '0'};
   position: relative;
   margin-bottom: 3rem;
   width: 50%;
-  
-  &:nth-child(even) {
-    align-self: flex-end;
-    justify-content: flex-start;
-    padding-right: 0;
-    padding-left: 30px;
-    margin-left: auto;
-  }
-  
+  align-self: ${({ side }) => side === 'left' ? 'flex-start' : 'flex-end'};
+  margin-left: ${({ side }) => side === 'right' ? 'auto' : '0'};
+
   @media (max-width: 768px) {
     width: 100%;
     padding-left: 60px;
     padding-right: 0;
-    
-    &:nth-child(even) {
-      padding-left: 60px;
-    }
+    justify-content: flex-start;
+    margin-left: 0;
   }
 `;
+
 
 const TimelineDot = styled(motion.div)`
   position: absolute;
   top: 20px;
-  left: calc(100% + 1.5px);
+  left: ${({ side }) => side === 'left' ? 'calc(100% + 1.5px)' : '-21.5px'};
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background: ${props => props.theme.primary};
   box-shadow: 0 0 0 4px ${props => props.theme.background}, 0 0 0 6px ${props => props.theme.primary}33;
   z-index: 1;
-  
+
   &::before {
     content: '';
     position: absolute;
     top: 50%;
-    right: calc(100% + 5px);
+    ${({ side }) => side === 'left' ? 'right' : 'left'}: calc(100% + 5px);
     width: 20px;
     height: 2px;
     background: ${props => props.theme.primary}66;
     transform: translateY(-50%);
   }
-  
-  ${TimelineItem}:nth-child(even) & {
-    left: -21.5px;
-    
+
+  @media (max-width: 768px) {
+    left: 20px;
+
     &::before {
       left: calc(100% + 5px);
       right: auto;
     }
   }
-  
-  @media (max-width: 768px) {
-    left: 20px;
-    
-    ${TimelineItem}:nth-child(even) & {
-      left: 20px;
-      
-      &::before {
-        left: calc(100% + 5px);
-        right: auto;
-      }
-    }
-  }
 `;
+
 
 const TimelineContent = styled(motion.div)`
   background: ${props => props.theme.surface};
@@ -414,55 +396,60 @@ const Experience = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {displayData.map((item, index) => (
-              <ScrollReveal key={index} delay={index * 0.2} threshold={0.1}>
-                <TimelineItem>
-                  <TimelineDot
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 300, 
-                      delay: 0.2 + index * 0.1 
-                    }}
-                  />
-                  <TimelineContent
-                    initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                  >
-                    <TimelineDate>
-                      <FaCalendarAlt /> {item.date}
-                    </TimelineDate>
-                    <TimelineTitle>{item.title}</TimelineTitle>
-                    <TimelineSubtitle>
-                      <FaBuilding /> {item.company}
-                    </TimelineSubtitle>
-                    <TimelineSubtitle>
-                      <FaMapMarkerAlt /> {item.location}
-                    </TimelineSubtitle>
-                    <TimelineDescription>{item.description}</TimelineDescription>
+            {displayData.map((item, index) => {
+              const side = activeTab === 'work' ? 'left' : 'right';
 
-                    {item.skills?.length > 0 && (
-                      <TimelineTags>
-                        {item.skills.map((skill, i) => (
-                          <TimelineTag key={i}>{skill}</TimelineTag>
-                        ))}
-                      </TimelineTags>
-                    )}
+              return (
+                <ScrollReveal key={index} delay={index * 0.2} threshold={0.1}>
+                  <TimelineItem side={side}>
+                    <TimelineDot
+                      side={side}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        delay: 0.2 + index * 0.1,
+                      }}
+                    />
+                    <TimelineContent
+                      initial={{ opacity: 0, x: side === 'left' ? 50 : -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                    >
+                      <TimelineDate>
+                        <FaCalendarAlt /> {item.date}
+                      </TimelineDate>
+                      <TimelineTitle>{item.title}</TimelineTitle>
+                      <TimelineSubtitle>
+                        <FaBuilding /> {item.company}
+                      </TimelineSubtitle>
+                      <TimelineSubtitle>
+                        <FaMapMarkerAlt /> {item.location}
+                      </TimelineSubtitle>
+                      <TimelineDescription>{item.description}</TimelineDescription>
 
-                    {item.link && (
-                      <TimelineLink href={item.link} target="_blank" rel="noopener noreferrer">
-                        Visit Website <FaLink />
-                      </TimelineLink>
-                    )}
-                  </TimelineContent>
-                </TimelineItem>
+                      {item.skills?.length > 0 && (
+                        <TimelineTags>
+                          {item.skills.map((skill, i) => (
+                            <TimelineTag key={i}>{skill}</TimelineTag>
+                          ))}
+                        </TimelineTags>
+                      )}
 
-              </ScrollReveal>
-            ))}
+                      {item.link && (
+                        <TimelineLink href={item.link} target="_blank" rel="noopener noreferrer">
+                          Visit Website <FaLink />
+                        </TimelineLink>
+                      )}
+                    </TimelineContent>
+                  </TimelineItem>
+                </ScrollReveal>
+              );
+            })}
           </TimelineContainer>
         </AnimatePresence>
+
       </SectionContent>
     </ExperienceSection>
   );
