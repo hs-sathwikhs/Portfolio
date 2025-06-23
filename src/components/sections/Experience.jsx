@@ -442,11 +442,15 @@ const Experience = () => {
                       <FaMapMarkerAlt /> {item.location}
                     </TimelineSubtitle>
                     <TimelineDescription>{item.description}</TimelineDescription>
-                    <TimelineTags>
-                      {item.skills.map((skill, i) => (
-                        <TimelineTag key={i}>{skill}</TimelineTag>
-                      ))}
-                    </TimelineTags>
+
+                    {item.skills?.length > 0 && (
+                      <TimelineTags>
+                        {item.skills.map((skill, i) => (
+                          <TimelineTag key={i}>{skill}</TimelineTag>
+                        ))}
+                      </TimelineTags>
+                    )}
+
                     {item.link && (
                       <TimelineLink href={item.link} target="_blank" rel="noopener noreferrer">
                         Visit Website <FaLink />
@@ -454,6 +458,7 @@ const Experience = () => {
                     )}
                   </TimelineContent>
                 </TimelineItem>
+
               </ScrollReveal>
             ))}
           </TimelineContainer>
