@@ -332,52 +332,43 @@ const Experience = () => {
   
   const workExperience = [
     {
-      title: 'Software Engineer',
-      company: 'Accenture',
+      title: 'Blockchain Research Intern',
+      company: 'PESU C-ISFCR',
       location: 'Bengaluru, India',
-      date: 'Aug 2022 - Present',
-      description: 'Working as a Full Stack Developer with expertise in React, Node.js, and AWS. Developing and maintaining web applications for clients in the financial services sector.',
-      skills: ['React', 'Node.js', 'AWS', 'JavaScript', 'TypeScript'],
-      link: 'https://www.accenture.com'
-    },
-    {
-      title: 'Associate Software Engineer',
-      company: 'Accenture',
-      location: 'Bengaluru, India',
-      date: 'Feb 2021 - Jul 2022',
-      description: 'Worked on front-end development using React and back-end development using Node.js. Implemented responsive designs and improved user experience across multiple platforms.',
-      skills: ['React', 'Node.js', 'Express', 'MongoDB', 'REST API'],
-      link: 'https://www.accenture.com'
-    },
-    {
-      title: 'Intern',
-      company: 'Tequed Labs',
-      location: 'Bengaluru, India',
-      date: 'Jan 2020 - Mar 2020',
-      description: 'Developed web applications using React and Node.js. Worked on UI/UX design and implementation for various client projects.',
-      skills: ['React', 'HTML5', 'CSS3', 'JavaScript', 'UI/UX'],
-      link: 'https://tequedlabs.com'
+      date: 'Jun2025 - Present',
+      description: 'Working as a Research Intern working in the domain of Blockchain. Developing a web applications for creating and claiming certificates for courses and programs as NFTs to protect the authenticity of the certificates.',
+      skills: ['Solidity', 'Blockchain', 'React', 'JavaScript', 'Node.js'],
+      link: 'https://www.isfcr.pes.edu/'
     }
   ];
   
   const education = [
     {
-      title: 'Bachelor of Engineering in Computer Science',
-      company: 'Visvesvaraya Technological University',
+      title: 'Bachelor of Technology in Computer Science and Engineering',
+      company: 'PES University',
       location: 'Bengaluru, India',
-      date: '2016 - 2020',
-      description: 'Completed a comprehensive program covering programming fundamentals, data structures, algorithms, and software engineering principles. Participated in multiple hackathons and coding competitions.',
-      skills: ['Data Structures', 'Algorithms', 'Java', 'Python', 'Web Development'],
-      link: 'https://vtu.ac.in'
+      date: '2023 - 2027',
+      description: 'Pursuing a comprehensive program covering programming fundamentals, data structures, algorithms, and software engineering principles. Working on multiple projects in various domains.',
+      skills: ['Data Structures', 'Algorithms', 'Full-Stack Development', 'Python', 'Blockchain'],
+      link: 'https://pes.edu/'
     },
     {
       title: 'Pre-University Course (PUC)',
-      company: 'Sri Bhagawan Mahaveer Jain College',
-      location: 'Bengaluru, India',
-      date: '2014 - 2016',
-      description: 'Completed higher secondary education with a focus on Physics, Chemistry, Mathematics, and Computer Science.',
-      skills: ['Physics', 'Chemistry', 'Mathematics', 'Computer Science'],
-      link: 'https://jainuniversity.ac.in'
+      company: 'TLC PU College (A unit of CFAL)',
+      location: 'Mangaluru, India',
+      date: '2021 - 2023',
+      description: 'Completed higher secondary education with a focus on Physics, Chemistry, Mathematics, and Statistics.',
+      skills: ['Physics', 'Chemistry', 'Mathematics', 'Statistics'],
+      link: 'https://tlc.edu.in/pu-college/'
+    },
+    {
+      title: 'School',
+      company: 'Mother Teresa Memorial School',
+      location: 'Shankaranarayana, India',
+      date: '2009 - 2021',
+      description: 'Completed primary and secondary education with a focus on basic subjects.',
+      /*skills: ['Physics', 'Chemistry', 'Mathematics', 'Statistics'],*/
+      link: 'https://motherteresatrust.com/'
     }
   ];
   
