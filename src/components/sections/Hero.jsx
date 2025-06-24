@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import Button from '../common/Button';
-import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from 'react-icons/fa';
 
 const HeroSection = styled.section`
   min-height: 100vh;
@@ -635,10 +634,10 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            I specialize in building exceptional digital experiences through clean, 
-            efficient code and user-centered design. Based in India's Silicon Valley, 
-            I combine innovative tech solutions with a deep understanding of both local 
-            and global markets to create impactful web applications.
+            I’m a CSE undergrad at PES University who enjoys turning clean UI into functional magic. 
+            Lately, I've been building a decentralized certification platform — because PDFs shouldn't be proof of anything. 
+            <br />I explore cross-protocol bridges too, mostly because the tech world’s full of brilliant systems that refuse to speak to each other. 
+            Somewhere between React components and Solidity contracts, I’m just trying to build stuff that’s simple, secure, and slightly ahead of its time.
           </Description>
           <ButtonGroup>
             <motion.div
@@ -664,52 +663,6 @@ const Hero = () => {
               </Button>
             </motion.div>
           </ButtonGroup>
-          <SocialLinks>
-            <motion.a
-              href="https://github.com/sathwikhs17"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              whileHover={{ y: -5, color: '#9D4EDD' }}
-            >
-              <FaGithub />
-            </motion.a>
-            <motion.a
-              href="https://linkedin.com/in/sathwikhs17"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              whileHover={{ y: -5, color: '#9D4EDD' }}
-            >
-              <FaLinkedin />
-            </motion.a>
-            <motion.a
-              href="https://twitter.com/sathwikhs17"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              whileHover={{ y: -5, color: '#9D4EDD' }}
-            >
-              <FaTwitter />
-            </motion.a>
-            <motion.a
-              href="https://instagram.com/sathwikhs17"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              whileHover={{ y: -5, color: '#9D4EDD' }}
-            >
-              <FaInstagram />
-            </motion.a>
-          </SocialLinks>
         </HeroInfo>
         <ProfileImageContainer
           initial={{ opacity: 0, scale: 0.8 }}

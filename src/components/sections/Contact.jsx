@@ -11,7 +11,7 @@ const ContactSection = styled.section`
   overflow: hidden;
   
   @media (min-width: 768px) {
-  padding: 5rem 2rem;
+    padding: 5rem 2rem;
   }
   
   &::before {
@@ -225,7 +225,7 @@ const TextArea = styled(motion.textarea)`
   }
   
   @media (min-width: 768px) {
-  min-height: 150px;
+    min-height: 150px;
   }
   
   @media (max-width: 480px) {
@@ -414,26 +414,27 @@ const SocialLink = styled(motion.a)`
 
 const Notification = styled.div`
   position: fixed;
-  top: 20px;
+  top: 30px;
   left: 50%;
-  transform: translateX(-50%) translateY(${props => props.isVisible ? 0 : '-20px'});
-  background: ${props => props.theme.primary};
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%) translateY(${props => props.isVisible ? '0' : '-50px'});
+  background: rgba(157, 78, 221, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(157, 78, 221, 0.2);
+  color: ${props => props.theme.text};
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  box-shadow: 0 8px 25px rgba(157, 78, 221, 0.15);
   z-index: 1000;
   opacity: ${props => props.isVisible ? 1 : 0};
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  font-size: 0.85rem;
-  max-width: 90%;
-  width: auto;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 120px;
   text-align: center;
   
   @media (min-width: 768px) {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-    max-width: 300px;
+    padding: 0.8rem 1.75rem;
+    font-size: 0.95rem;
   }
 `;
 
@@ -441,6 +442,7 @@ const Contact = () => {
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [showNotification, setShowNotification] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -474,14 +476,20 @@ const Contact = () => {
   
   const handleMouseEnter = () => {
     if (!formRef.current) return;
-    formRef.current.querySelector('.form-glow').style.opacity = 1;
+    const glowElement = formRef.current.querySelector('.form-glow');
+    if (glowElement) {
+      glowElement.style.opacity = 1;
+    }
   };
   
   const handleMouseLeave = () => {
     if (!formRef.current) return;
     x.set(0);
     y.set(0);
-    formRef.current.querySelector('.form-glow').style.opacity = 0;
+    const glowElement = formRef.current.querySelector('.form-glow');
+    if (glowElement) {
+      glowElement.style.opacity = 0;
+    }
   };
 
   const handleChange = (e) => {
@@ -503,14 +511,22 @@ const Contact = () => {
   };
   
   const handleTextClick = (text, e) => {
-    setSelectedText(text);
-    setMenuPosition({ x: e.clientX, y: e.clientY });
-    setIsMenuVisible(true);
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 1000);
   };
   
   const handleCopyText = () => {
     navigator.clipboard.writeText(selectedText);
     setIsMenuVisible(false);
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 1000);
   };
   
   useEffect(() => {
@@ -576,7 +592,7 @@ const Contact = () => {
               <FormTitle><FaEnvelope /> Send Me a Message</FormTitle>
               <ContactForm onSubmit={handleSubmit}>
                 <ScrollReveal delay={0.1}>
-        <FormGroup>
+                  <FormGroup>
                     <Label
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -584,23 +600,23 @@ const Contact = () => {
                     >
                       Your Name
                     </Label>
-          <Input
-            type="text"
-            name="name"
+                    <Input
+                      type="text"
+                      name="name"
                       value={formData.name}
-            onChange={handleChange}
+                      onChange={handleChange}
                       placeholder="Full Name"
-            required
+                      required
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                       whileFocus={{ scale: 1.01 }}
-          />
-        </FormGroup>
+                    />
+                  </FormGroup>
                 </ScrollReveal>
                 
                 <ScrollReveal delay={0.2}>
-        <FormGroup>
+                  <FormGroup>
                     <Label
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -608,9 +624,9 @@ const Contact = () => {
                     >
                       Your Email
                     </Label>
-          <Input
-            type="email"
-            name="email"
+                    <Input
+                      type="email"
+                      name="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="mail@example.com"
@@ -636,19 +652,19 @@ const Contact = () => {
                       type="text"
                       name="subject"
                       value={formData.subject}
-            onChange={handleChange}
+                      onChange={handleChange}
                       placeholder="Project Inquiry"
-            required
+                      required
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: 0.2 }}
                       whileFocus={{ scale: 1.01 }}
-          />
-        </FormGroup>
+                    />
+                  </FormGroup>
                 </ScrollReveal>
                 
                 <ScrollReveal delay={0.4}>
-        <FormGroup>
+                  <FormGroup>
                     <Label
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -656,23 +672,23 @@ const Contact = () => {
                     >
                       Message
                     </Label>
-          <TextArea
-            name="message"
+                    <TextArea
+                      name="message"
                       value={formData.message}
-            onChange={handleChange}
+                      onChange={handleChange}
                       placeholder="Your message here..."
-            required
+                      required
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: 0.3 }}
                       whileFocus={{ scale: 1.01 }}
-          />
-        </FormGroup>
+                    />
+                  </FormGroup>
                 </ScrollReveal>
                 
                 <ScrollReveal delay={0.5}>
-        <SubmitButton
-          type="submit"
+                  <SubmitButton
+                    type="submit"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -707,10 +723,7 @@ const Contact = () => {
                         <span onClick={(e) => handleTextClick('hs.sathwikhs@gmail.com', e)}>
                           hs.sathwikhs@gmail.com
                         </span>
-                        <FaCopy onClick={(e) => {
-                          e.stopPropagation();
-                          handleTextClick('hs.sathwikhs@gmail.com', e);
-                        }} />
+                        <FaCopy onClick={(e) => handleTextClick('hs.sathwikhs@gmail.com', e)} />
                       </p>
                     </ContactText>
                   </ContactItem>
@@ -731,10 +744,7 @@ const Contact = () => {
                         <span onClick={(e) => handleTextClick('+91 9964466062', e)}>
                           +91 9964466062
                         </span>
-                        <FaCopy onClick={(e) => {
-                          e.stopPropagation();
-                          handleTextClick('+91 9964466062', e);
-                        }} />
+                        <FaCopy onClick={(e) => handleTextClick('+91 9964466062', e)} />
                       </p>
                     </ContactText>
                   </ContactItem>
@@ -755,54 +765,13 @@ const Contact = () => {
                     </ContactText>
                   </ContactItem>
                 </ScrollReveal>
-                
-                <ScrollReveal delay={0.6}>
-                  <SocialLinks>
-                    <SocialLink 
-                      href="https://github.com/sathwikhs17" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      whileHover={{ y: -5 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      <FaGithub />
-                    </SocialLink>
-                    <SocialLink 
-                      href="https://linkedin.com/in/sathwikhs17" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      whileHover={{ y: -5 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      <FaLinkedin />
-                    </SocialLink>
-                    <SocialLink 
-                      href="https://twitter.com/sathwikhs17" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      whileHover={{ y: -5 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      <FaTwitter />
-                    </SocialLink>
-                    <SocialLink 
-                      href="https://instagram.com/sathwikhs17" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      whileHover={{ y: -5 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      <FaInstagram />
-                    </SocialLink>
-                  </SocialLinks>
-                </ScrollReveal>
               </ContactInfo>
             </ContactInfoCard>
           </ScrollReveal>
         </ContactGrid>
         
         <ActionMenu 
-          isVisible={isMenuVisible} 
+          isVisible={false}
           style={{ 
             top: `${menuPosition.y}px`, 
             left: `${menuPosition.x}px` 
@@ -815,8 +784,8 @@ const Contact = () => {
         </ActionMenu>
       </SectionContent>
       
-      <Notification isVisible={isMenuVisible}>
-        {selectedText} copied to clipboard!
+      <Notification isVisible={showNotification}>
+        Copied!
       </Notification>
     </ContactSection>
   );
