@@ -10,7 +10,6 @@ const ScrollReveal = ({
   className = '',
   style = {}
 }) => {
-  // Set initial animation values based on direction
   const getInitialPosition = () => {
     switch (direction) {
       case 'up':

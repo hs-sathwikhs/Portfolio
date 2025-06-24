@@ -277,12 +277,9 @@ const ProjectDetail = () => {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5]);
   
   useEffect(() => {
-    // In a real app, you would fetch the project data from an API
-    // For this demo, we'll use mock data
     const fetchProject = () => {
       setLoading(true);
       
-      // Mock projects data - in a real app, this would come from an API or database
       const projects = [
         {
           id: '1',
@@ -354,7 +351,6 @@ const ProjectDetail = () => {
     
     fetchProject();
     
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, [id]);
   

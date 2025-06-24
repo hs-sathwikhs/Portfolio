@@ -13,7 +13,7 @@ const FloatingContainer = styled.div`
   border-radius: 28px;
   display: flex;
   gap: 1.2rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   z-index: 9999;
   box-shadow: 0 6px 24px #9d4edd22;
   transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
@@ -27,13 +27,13 @@ const FloatingContainer = styled.div`
 
   @media (max-width: 768px) {
     gap: 0.8rem;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1.25rem;
   }
 `;
 
 const IconLink = styled.a`
   color: #aaa;
-  font-size: 1.3rem;
+  font-size: 1.625rem;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -45,7 +45,7 @@ const IconLink = styled.a`
   }
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1.375rem;
   }
 `;
 

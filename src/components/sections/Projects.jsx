@@ -7,7 +7,7 @@ import Button from '../common/Button';
 
 const ProjectsSection = styled.section`
   padding: 5rem 2rem;
-  background: ${props => props.theme.surface};
+  background: ${props => props.theme.background};
   position: relative;
   overflow: hidden;
   
@@ -18,11 +18,11 @@ const ProjectsSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop') no-repeat;
+    background: url('https://images.unsplash.com/photo-1545987796-200677ee1011?q=80&w=2070&auto=format&fit=crop') no-repeat;
     background-size: cover;
     background-position: center;
     opacity: 0.02;
-    z-index: -1;
+    z-index: 0;
   }
 `;
 
@@ -218,7 +218,7 @@ const ProjectLinks = styled.div`
     &:hover {
       color: ${props => props.theme.primary};
       transform: translateY(-3px);
-      background: ${props => props.theme.surface};
+      background: ${props => props.theme.background};
       box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
     }
   }
@@ -245,7 +245,6 @@ const ViewDetailsLink = styled(Link)`
   }
 `;
 
-// Component to stop event propagation for links inside the card
 const StopPropagation = ({ children, ...props }) => {
   const handleClick = (e) => {
     e.stopPropagation();
@@ -262,30 +261,30 @@ const Projects = () => {
   const projects = [
     {
       id: 1,
-      title: 'E-Commerce Platform',
-      description: 'A full-featured e-commerce platform with product listings, cart functionality, and secure checkout.',
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop',
+      title: 'Avora',
+      description: 'A full-featured e-commerce platform for Art and art lovers with product listings, cart functionality, and secure checkout.',
+      image: 'https://images.unsplash.com/photo-1530800089-e0f33f51d5ff?q=80&w=1470&auto=format&fit=crop',
       technologies: ['React', 'Node.js', 'MongoDB', 'Express'],
-      github: 'https://github.com/sathwikhs17/ecommerce',
-      live: 'https://ecommerce-demo.com'
+      github: 'https://github.com/hs-sathwikhs/avora',
+      live: 'https://hs-sathwikhs.github.io/Avora'
     },
     {
       id: 2,
-      title: 'Task Management App',
-      description: 'A productivity app for managing tasks, projects, and deadlines with team collaboration features.',
-      image: 'https://images.unsplash.com/photo-1540350394557-8d14678e7f91?q=80&w=2032&auto=format&fit=crop',
-      technologies: ['React', 'Firebase', 'Material UI', 'Redux'],
-      github: 'https://github.com/sathwikhs17/taskmanager',
-      live: 'https://taskmanager-demo.com'
+      title: 'Bank Networks',
+      description: 'A secure bank network simulation built in Cisco Packet Tracer,featuring inter-branch communication via ASA firewall and authentication.',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1634&auto=format&fit=crop',
+      technologies: ['Computer Networks', 'Cisco Packet Tracer'],
+      github: 'https://github.com/hs-sathwikhs/Bank_Network',
+      live: 'https://github.com/hs-sathwikhs/Bank_Network'
     },
     {
       id: 3,
-      title: 'Weather Dashboard',
-      description: 'A weather application that provides real-time forecasts, historical data, and interactive maps.',
-      image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?q=80&w=2070&auto=format&fit=crop',
-      technologies: ['JavaScript', 'Weather API', 'Chart.js', 'CSS'],
-      github: 'https://github.com/sathwikhs17/weather',
-      live: 'https://weather-demo.com'
+      title: 'Cross Protocol Bridging',
+      description: 'A socket programming project in C that bridges CoAP and MQTT, enabling protocol interoperability between edge IoT devices and cloud systems.',
+      image: 'https://images.unsplash.com/photo-1727646798983-9154aa42f6aa?q=80&w=880&auto=format&fit=crop',
+      technologies: ['Socket Programming', 'C', 'TCP/UDP Networking', 'Protocol Translation'],
+      github: '#',
+      live: '#'
     }
   ];
 

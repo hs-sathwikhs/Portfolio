@@ -171,7 +171,6 @@ const FilterButton = styled.button`
   }
 `;
 
-// Component to stop event propagation for links inside the card
 const StopPropagation = ({ children, ...props }) => {
   const handleClick = (e) => {
     e.stopPropagation();
@@ -190,9 +189,7 @@ const AllProjects = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   
   useEffect(() => {
-    // In a real app, you would fetch this data from an API
     const fetchProjects = () => {
-      // Mock projects data
       const projectsData = [
         {
           id: '1',
@@ -262,7 +259,6 @@ const AllProjects = () => {
     
     fetchProjects();
     
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
   

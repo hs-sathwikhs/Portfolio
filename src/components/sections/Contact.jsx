@@ -6,7 +6,7 @@ import ScrollReveal from '../common/ScrollReveal';
 
 const ContactSection = styled.section`
   padding: 5rem 1rem;
-  background: ${props => props.theme.surface};
+  background: ${props => props.theme.background};
   position: relative;
   overflow: hidden;
   
@@ -21,7 +21,7 @@ const ContactSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2029&auto=format&fit=crop') no-repeat;
+    background: url('https://images.unsplash.com/photo-1545987796-200677ee1011?q=80&w=2070&auto=format&fit=crop') no-repeat;
     background-size: cover;
     background-position: center;
     opacity: 0.02;
@@ -466,7 +466,6 @@ const Contact = () => {
     x.set((e.clientX - centerX) / 10);
     y.set((e.clientY - centerY) / 10);
     
-    // Update glow position
     const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
     const mouseY = ((e.clientY - rect.top) / rect.height) * 100;
     
@@ -499,7 +498,6 @@ const Contact = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, you would handle form submission here
     console.log('Form submitted:', formData);
     alert('Thank you for your message! I will get back to you soon.');
     setFormData({

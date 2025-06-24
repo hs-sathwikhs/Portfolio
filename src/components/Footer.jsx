@@ -2,10 +2,29 @@ import styled from 'styled-components';
 import { FaGithub, FaLinkedin, FaTwitter, FaHeart, FaInstagram } from 'react-icons/fa';
 
 const FooterContainer = styled.footer`
-  background: ${props => props.theme.surface};
+  position: relative;
+  background: ${props => props.theme.background};
   padding: 2rem;
   margin-top: auto;
   border-top: 1px solid rgba(157, 78, 221, 0.1);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+    rgba(0, 0, 0, 0), 
+    rgba(0, 0, 0, 0)
+    ),
+    background: url('https://images.unsplash.com/photo-1545987796-200677ee1011?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    opacity: 0.02;
+    z-index: 0;
+  }
 `;
 
 const FooterContent = styled.div`
@@ -15,6 +34,8 @@ const FooterContent = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  position: relative;
+  z-index: 1;
 `;
 
 const SocialLinks = styled.div`

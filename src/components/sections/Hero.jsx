@@ -8,13 +8,12 @@ const HeroSection = styled.section`
   display: flex;
   align-items: center;
   padding: 0 1rem;
-  margin-top: 60px; // Adjust based on navbar height for mobile
+  margin-top: 60px;
   position: relative;
   overflow: hidden;
   
   @media (min-width: 768px) {
-    padding: 0 2rem;
-    margin-top: 80px; // Adjust based on navbar height for desktop
+    padding: 0 2rem;    
   }
   
   &::before {
@@ -24,11 +23,15 @@ const HeroSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1607743386760-88f10eb85a79?q=80&w=2070&auto=format&fit=crop') no-repeat;
+    background: linear-gradient(
+    rgba(0, 0, 0, 0.02), 
+    rgba(0, 0, 0, 0.02)
+    ),
+    
     background-size: cover;
     background-position: center;
-    opacity: 0.05;
-    z-index: -1;
+    opacity: 0.02;
+    z-index: 1;
   }
 `;
 
@@ -248,20 +251,21 @@ const Subtitle = styled(motion.h2)`
 
 const TypewriterContainer = styled.div`
   display: inline-block;
-  min-width: 280px; // Adjust this value based on your longest text
-  height: 1.2em; // Fixed height to prevent jumping
+  min-width: 280px;
+  height: 1.2em;
   position: relative;
-  overflow: visible; // Allow cursor to be visible outside container
+  text-align: left;
+  overflow: visible;
   
   @media (min-width: 768px) {
-    min-width: 320px; // Larger min-width for desktop
+    min-width: 320px;
     height: 1.2em;
   }
 `;
 
 const TypewriterText = styled(motion.span)`
   position: absolute;
-  white-space: nowrap; // Prevent text from wrapping
+  white-space: nowrap;
   
   &::after {
     content: '|';
@@ -416,30 +420,27 @@ const Hero = () => {
     let animationFrameId;
     let particles = [];
     
-    // Set canvas dimensions
     const setCanvasDimensions = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     };
     
-    // Initialize particles
     const initParticles = () => {
       particles = [];
-      const particleCount = Math.floor(window.innerWidth / 10); // Responsive particle count
+      const particleCount = Math.floor(window.innerWidth / 10);
       
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           radius: Math.random() * 2 + 1,
-          color: `rgba(157, 78, 221, ${Math.random() * 0.5 + 0.1})`, // Lavender with varying opacity
+          color: `rgba(157, 78, 221, ${Math.random() * 0.5 + 0.1})`,
           speedX: Math.random() * 0.5 - 0.25,
           speedY: Math.random() * 0.5 - 0.25
         });
       }
     };
     
-    // Draw particles
     const drawParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
@@ -449,18 +450,15 @@ const Hero = () => {
         ctx.fillStyle = particle.color;
         ctx.fill();
         
-        // Update position
         particle.x += particle.speedX;
         particle.y += particle.speedY;
         
-        // Wrap around edges
         if (particle.x < 0) particle.x = canvas.width;
         if (particle.x > canvas.width) particle.x = 0;
         if (particle.y < 0) particle.y = canvas.height;
         if (particle.y > canvas.height) particle.y = 0;
       });
       
-      // Draw connections between nearby particles
       particles.forEach((particle, i) => {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particle.x - particles[j].x;
@@ -481,27 +479,23 @@ const Hero = () => {
       animationFrameId = requestAnimationFrame(drawParticles);
     };
     
-    // Handle resize
     const handleResize = () => {
       setCanvasDimensions();
       initParticles();
     };
     
-    // Initialize
     setCanvasDimensions();
     initParticles();
     drawParticles();
     
     window.addEventListener('resize', handleResize);
     
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
   
-  // Typewriter effect
   useEffect(() => {
     const currentText = texts[textIndex];
     
@@ -512,7 +506,7 @@ const Hero = () => {
         
         if (displayText.length === currentText.length) {
           setIsDeleting(true);
-          setTypingSpeed(1000); // Pause at the end
+          setTypingSpeed(1000);
         }
       } else {
         setDisplayText(currentText.substring(0, displayText.length - 1));
@@ -521,7 +515,7 @@ const Hero = () => {
         if (displayText.length === 0) {
           setIsDeleting(false);
           setTextIndex((textIndex + 1) % texts.length);
-          setTypingSpeed(500); // Pause before next word
+          setTypingSpeed(500);
         }
       }
     }, typingSpeed);

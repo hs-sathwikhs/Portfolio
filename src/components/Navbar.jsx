@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 const Nav = styled(motion.nav)`
-  background: ${props => props.theme.surface};
+  background: #1c1c28ee;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #9d4edd22;
+  box-shadow: 0 6px 24px #9d4edd22;
   padding: 0.75rem 1rem;
   position: fixed;
   width: 100%;
@@ -122,22 +125,18 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Close mobile menu when clicking a link
   const handleLinkClick = () => {
     if (isOpen) {
       setIsOpen(false);
     }
   };
 
-  // Scroll to section function
   const scrollToSection = (sectionId, e) => {
     e.preventDefault();
     handleLinkClick();
     
-    // If we're not on the home page, navigate to home first then scroll
     if (location.pathname !== '/') {
       navigate('/');
-      // Use setTimeout to ensure navigation completes before scrolling
       setTimeout(() => {
         const section = document.getElementById(sectionId);
         if (section) {
@@ -147,24 +146,20 @@ const Navbar = () => {
       return;
     }
     
-    // If we're already on the home page, just scroll to the section
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  // Add shadow on scroll and track active section
   useEffect(() => {
     const handleScroll = () => {
-      // Add shadow when scrolled
       if (window.scrollY > 20) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
       
-      // Track active section
       if (location.pathname === '/') {
         const sections = ['home', 'skills', 'projects', 'experience', 'contact'];
         
@@ -172,7 +167,6 @@ const Navbar = () => {
           const section = document.getElementById(sectionId);
           if (section) {
             const rect = section.getBoundingClientRect();
-            // If the section is in view (with some buffer for better UX)
             if (rect.top <= 100 && rect.bottom >= 100) {
               setActiveSection(sectionId);
               break;
@@ -188,7 +182,6 @@ const Navbar = () => {
     };
   }, [location.pathname]);
 
-  // Animation variants
   const navVariants = {
     hidden: { y: -100 },
     visible: { 
