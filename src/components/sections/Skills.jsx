@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from '../common/ScrollReveal';
 import { 
-  FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs, 
-  FaDatabase, FaGitAlt, FaFigma, FaDocker, FaAws 
+  FaReact, FaNodeJs, FaHtml5, FaJs,
+  FaGitAlt, FaNetworkWired, 
+  FaRobot , FaHardHat  
 } from 'react-icons/fa';
-import { SiTypescript, SiNextdotjs, SiMongodb, SiExpress, SiRedux } from 'react-icons/si';
+import { SiExpress, SiSolidity, SiMongodb } from 'react-icons/si';
 
 const SkillsSection = styled.section`
   padding: 5rem 2rem;
@@ -276,7 +277,7 @@ const SkillCardGlow = styled(motion.div)`
 `;
 
 const Skills = () => {
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('languages');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   const handleMouseMove = (e, cardElement) => {
@@ -291,109 +292,98 @@ const Skills = () => {
   };
   
   const categories = [
-    { id: 'all', name: 'All Skills' },
-    { id: 'frontend', name: 'Frontend' },
-    { id: 'backend', name: 'Backend' },
-    { id: 'tools', name: 'Tools & DevOps' }
-  ];
+    { id: 'languages', name: 'Programming Languages' },
+    { id: 'development', name: 'Frameworks & Platforms' },
+    { id: 'blockchain', name: 'Blockchain & Web3' },
+    { id: 'tools', name: 'Tools & Workflows' }
+  ];  
   
   const skills = [
     {
+      name: 'Solidity',
+      icon: <SiSolidity />,
+      level: 20,
+      experience: '1 years',
+      description: 'Expert in writing secure and efficient smart contracts on Ethereum-compatible blockchains using Solidity.',
+      categories: ['blockchain', 'languages']
+    },
+    {
       name: 'React',
       icon: <FaReact />,
-      level: 90,
-      experience: '4+ years',
+      level: 60,
+      experience: '2+ years',
       description: 'Building complex user interfaces and single-page applications with React and its ecosystem.',
-      categories: ['frontend']
+      categories: ['development']
     },
     {
       name: 'Node.js',
       icon: <FaNodeJs />,
-      level: 85,
-      experience: '3+ years',
+      level: 60,
+      experience: '1+ years',
       description: 'Creating scalable backend services and RESTful APIs with Node.js.',
-      categories: ['backend']
+      categories: ['development']
     },
     {
       name: 'JavaScript',
       icon: <FaJs />,
-      level: 95,
-      experience: '5+ years',
+      level: 60,
+      experience: '1+ years',
       description: 'Proficient in modern JavaScript (ES6+) for both frontend and backend development.',
-      categories: ['frontend', 'backend']
-    },
-    {
-      name: 'TypeScript',
-      icon: <SiTypescript />,
-      level: 80,
-      experience: '2+ years',
-      description: 'Using TypeScript to build type-safe applications with improved developer experience.',
-      categories: ['frontend', 'backend']
+      categories: ['languages', 'blockchain']
     },
     {
       name: 'HTML5 & CSS3',
       icon: <FaHtml5 />,
       level: 90,
-      experience: '5+ years',
+      experience: '6+ years',
       description: 'Creating responsive and accessible web layouts with modern HTML5 and CSS3 features.',
-      categories: ['frontend']
+      categories: ['languages']
     },
-    {
+    /*{
       name: 'MongoDB',
       icon: <SiMongodb />,
-      level: 85,
-      experience: '3+ years',
+      level: 75,
+      experience: '1+ years',
       description: 'Designing and optimizing NoSQL database schemas and queries with MongoDB.',
-      categories: ['backend']
-    },
+      categories: ['development']
+    },*/
     {
       name: 'Express.js',
       icon: <SiExpress />,
-      level: 85,
-      experience: '3+ years',
-      description: 'Building robust server-side applications and APIs with Express.js framework.',
-      categories: ['backend']
-    },
-    {
-      name: 'Next.js',
-      icon: <SiNextdotjs />,
-      level: 80,
+      level: 65,
       experience: '2+ years',
-      description: 'Developing server-rendered React applications with improved SEO and performance.',
-      categories: ['frontend']
-    },
-    {
-      name: 'Redux',
-      icon: <SiRedux />,
-      level: 85,
-      experience: '3+ years',
-      description: 'Managing complex application state with Redux and middleware like Redux Thunk/Saga.',
-      categories: ['frontend']
+      description: 'Building robust server-side applications and APIs with Express.js framework.',
+      categories: ['development']
     },
     {
       name: 'Git & GitHub',
       icon: <FaGitAlt />,
-      level: 90,
-      experience: '4+ years',
+      level: 80,
       description: 'Version control, collaboration, and CI/CD workflows using Git and GitHub.',
       categories: ['tools']
     },
+    /*
     {
-      name: 'Docker',
-      icon: <FaDocker />,
-      level: 75,
-      experience: '2+ years',
-      description: 'Containerizing applications for consistent development and deployment environments.',
+      name: 'Computer Networks',
+      icon: <FaNetworkWired />,
+      level: 80,
+      description: 'Understanding of OSI model, IP addressing, routing, and networking protocols essential for backend and system design.',
+      categories: ['tools']
+    },*/
+    {
+      name: 'AI on Azure',
+      icon: <FaRobot />,
+      level: 35,
+      description: 'Building, deploying, and managing AI models using Azure Machine Learning and Cognitive Services.',
       categories: ['tools']
     },
     {
-      name: 'AWS',
-      icon: <FaAws />,
-      level: 70,
-      experience: '2+ years',
-      description: 'Deploying and managing applications on AWS cloud infrastructure.',
-      categories: ['tools']
-    }
+      name: 'Hardhat',
+      icon: <FaHardHat />,
+      level: 30,
+      description: 'Smart contract development framework for testing and deployment on Ethereum networks.',
+      categories: ['blockchain']
+    }    
   ];
   
   const filteredSkills = activeCategory === 'all' 
@@ -433,8 +423,7 @@ const Skills = () => {
         <ScrollReveal>
           <SectionTitle>My Skills</SectionTitle>
           <SectionDescription>
-            I've developed expertise in various technologies across the full stack development spectrum.
-            Here's a comprehensive overview of my technical skills and proficiency levels.
+            I focus on building robust web applications and exploring emerging technologies in the blockchain space. With a foundation in both frontend and backend development, I aim to create scalable, secure, and user-friendly digital solutions.
           </SectionDescription>
         </ScrollReveal>
         
@@ -473,29 +462,47 @@ const Skills = () => {
                 >
                   <SkillCardGlow />
                   <SkillHeader>
-                    <SkillIcon>{skill.icon}</SkillIcon>
+                    {skill.icon && <SkillIcon>{skill.icon}</SkillIcon>}
                     <SkillInfo>
                       <SkillName>{skill.name}</SkillName>
-                      <SkillLevel>
-                        {skill.level >= 90 ? 'Expert' : 
-                         skill.level >= 75 ? 'Advanced' : 
-                         skill.level >= 60 ? 'Intermediate' : 'Beginner'}
-                        <ExperienceBadge>{skill.experience}</ExperienceBadge>
-                      </SkillLevel>
+                      
+                      {(skill.level || skill.experience) && (
+                        <SkillLevel>
+                          {typeof skill.level === 'number' && (
+                            <>
+                              {skill.level >= 90
+                                ? 'Expert'
+                                : skill.level >= 75
+                                ? 'Advanced'
+                                : skill.level >= 60
+                                ? 'Intermediate'
+                                : 'Beginner'}
+                            </>
+                          )}
+                          {skill.experience && (
+                            <ExperienceBadge>{skill.experience}</ExperienceBadge>
+                          )}
+                        </SkillLevel>
+                      )}
                     </SkillInfo>
                   </SkillHeader>
-                  
-                  <ProgressBarContainer>
-                    <ProgressBarFill 
-                      progress={skill.level}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${skill.level}%` }}
-                      transition={{ duration: 1, delay: 0.2 }}
-                    />
-                  </ProgressBarContainer>
-                  
-                  <SkillDescription>{skill.description}</SkillDescription>
+
+                  {typeof skill.level === 'number' && (
+                    <ProgressBarContainer>
+                      <ProgressBarFill
+                        progress={skill.level}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${skill.level}%` }}
+                        transition={{ duration: 1, delay: 0.2 }}
+                      />
+                    </ProgressBarContainer>
+                  )}
+
+                  {skill.description && (
+                    <SkillDescription>{skill.description}</SkillDescription>
+                  )}
                 </SkillCard>
+
               </ScrollReveal>
             ))}
           </SkillsGrid>

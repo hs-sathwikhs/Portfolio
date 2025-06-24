@@ -329,7 +329,7 @@ const Experience = () => {
       title: 'Bachelor of Technology in Computer Science and Engineering',
       company: 'PES University',
       location: 'Bengaluru, India',
-      date: '2023 - 2027',
+      date: '2023 - Present',
       description: 'Pursuing a comprehensive program covering programming fundamentals, data structures, algorithms, and software engineering principles. Working on multiple projects in various domains.',
       skills: ['Data Structures', 'Algorithms', 'Full-Stack Development', 'Python', 'Blockchain'],
       link: 'https://pes.edu/'

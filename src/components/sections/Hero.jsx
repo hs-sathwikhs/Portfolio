@@ -407,7 +407,7 @@ const Hero = () => {
   
   const [displayText, setDisplayText] = useState('');
   const [textIndex, setTextIndex] = useState(0);
-  const texts = ['Full Stack Developer', 'UI/UX Enthusiast', 'Problem Solver'];
+  const texts = ['Blockchain Developer', 'Full Stack Developer', 'Networks Enthusiast'];
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(150);
   
@@ -628,7 +628,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <span>📍</span> Koramangala, Bengaluru
+            <span>📍</span> Bengaluru, India
           </Location>
           <Description
             initial={{ opacity: 0, y: 20 }}
