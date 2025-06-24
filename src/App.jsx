@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import PageTransition from './components/common/PageTransition';
 import AllProjects from './pages/AllProjects';
 import ProjectDetail from './pages/ProjectDetail';
+import FloatingSocialBar from './components/common/FloatingSocialBar';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         </Routes>
       </AnimatePresence>
       <Footer />
+      <FloatingSocialBar />
     </Router>
   );
 }

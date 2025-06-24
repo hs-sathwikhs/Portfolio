@@ -59,13 +59,13 @@ const Footer = () => {
     <FooterContainer>
       <FooterContent>
         <SocialLinks>
-          <a href="https://github.com/sathwikhs17" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/hs-sathwikhs" target="_blank" rel="noopener noreferrer">
             <FaGithub />
           </a>
-          <a href="https://linkedin.com/in/sathwikhs17" target="_blank" rel="noopener noreferrer">
+          <a href="https://linkedin.com/in/hs-sathwikhs" target="_blank" rel="noopener noreferrer">
             <FaLinkedin />
           </a>
-          <a href="https://twitter.com/sathwikhs17" target="_blank" rel="noopener noreferrer">
+          <a href="https://twitter.com/sathwikhss" target="_blank" rel="noopener noreferrer">
             <FaTwitter />
           </a>
           <a href="https://instagram.com/sathwikhs17" target="_blank" rel="noopener noreferrer">
