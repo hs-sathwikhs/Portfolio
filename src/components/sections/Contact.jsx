@@ -759,7 +759,7 @@ const Contact = () => {
                     </IconWrapper>
                     <ContactText>
                       <h4>Location</h4>
-                      <p>Koramangala, Bengaluru, India</p>
+                      <p>Bengaluru, India</p>
                     </ContactText>
                   </ContactItem>
                 </ScrollReveal>

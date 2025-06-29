@@ -23,6 +23,7 @@ const ProjectsSection = styled.section`
     background-position: center;
     opacity: 0.02;
     z-index: 0;
+    /* pointer-events: none; */
   }
 `;
 

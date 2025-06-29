@@ -193,64 +193,64 @@ const AllProjects = () => {
       const projectsData = [
         {
           id: '1',
-          title: 'E-Commerce Platform',
-          description: 'A full-featured e-commerce platform with product listings, cart functionality, and secure checkout.',
-          image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop',
-          technologies: ['React', 'Node.js', 'MongoDB', 'Express'],
-          category: 'web',
-          github: 'https://github.com/sathwikhs17/ecommerce',
-          live: 'https://ecommerce-demo.com'
+          title: 'Decentra Cert',
+          description: 'Decentra Cert is a decentralized certification platform using soulbound NFTs, enabling secure, verifiable, and tamper-proof academic credentials with Merkle trees, QR-based validation, and issuer authentication.',
+          image: 'https://images.unsplash.com/photo-1621439618661-bdfbdd14dca2?q=80&w=1470&auto=format&fit=crop',
+          technologies: ['Solidity', 'Node.js', 'React', 'Ether.js', 'ZK Proofs'],
+          category: 'blockchain',
+          github: '#',
+          live: '#'
         },
         {
           id: '2',
-          title: 'Task Management App',
-          description: 'A productivity app for managing tasks, projects, and deadlines with team collaboration features.',
-          image: 'https://images.unsplash.com/photo-1540350394557-8d14678e7f91?q=80&w=2032&auto=format&fit=crop',
-          technologies: ['React', 'Firebase', 'Material UI', 'Redux'],
+          title: 'Portfolio',
+          description: 'A sleek and interactive personal portfolio built with React, showcasing projects, skills, and experience with smooth animations and responsive design',
+          image: '/images/portfolio.png',
+          technologies: ['React', 'JavaScript', 'Vite', 'Framer Motion'],
           category: 'web',
-          github: 'https://github.com/sathwikhs17/taskmanager',
-          live: 'https://taskmanager-demo.com'
+          github: 'https://github.com/hs-sathwikhs/Portfolio',
+          live: 'https://sathwikhs.vercel.app'
         },
         {
-          id: '3',
-          title: 'Weather Dashboard',
-          description: 'A weather application that provides real-time forecasts, historical data, and interactive maps.',
-          image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?q=80&w=2070&auto=format&fit=crop',
-          technologies: ['JavaScript', 'Weather API', 'Chart.js', 'CSS'],
+          id: 3,
+          title: 'Bank Networks',
+          description: 'A secure bank network simulation built in Cisco Packet Tracer,featuring inter-branch communication via ASA firewall and authentication.',
+          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1634&auto=format&fit=crop',
+          technologies: ['Computer Networks', 'Cisco Packet Tracer'],
+          category: 'networks',
+          github: 'https://github.com/hs-sathwikhs/Bank_Network',
+          live: 'https://github.com/hs-sathwikhs/Bank_Network'
+        },
+        {
+          id: 4,
+          title: 'Cross Protocol Bridging',
+          description: 'A socket programming project in C that bridges CoAP and MQTT, enabling protocol interoperability between edge IoT devices and cloud systems.',
+          image: 'https://images.unsplash.com/photo-1727646798983-9154aa42f6aa?q=80&w=880&auto=format&fit=crop',
+          technologies: ['Socket Programming', 'C', 'TCP/UDP Networking', 'Protocol Translation'],
+          category: 'networks',
+          github: '#',
+          live: '#'
+        },
+        {
+          id: 5,
+          title: 'Avora',
+          description: 'A full-featured e-commerce platform for Art and art lovers with product listings, cart functionality, and secure checkout.',
+          image: 'https://images.unsplash.com/photo-1530800089-e0f33f51d5ff?q=80&w=1470&auto=format&fit=crop',
+          technologies: ['React', 'Node.js', 'MongoDB', 'Express'],
           category: 'web',
-          github: 'https://github.com/sathwikhs17/weather',
-          live: 'https://weather-demo.com'
-        },
-        {
-          id: '4',
-          title: 'Mobile Fitness Tracker',
-          description: 'A mobile app for tracking workouts, nutrition, and health metrics with personalized recommendations.',
-          image: 'https://images.unsplash.com/photo-1461773518188-b3e86f98242f?q=80&w=2069&auto=format&fit=crop',
-          technologies: ['React Native', 'Firebase', 'Redux', 'Health API'],
-          category: 'mobile',
-          github: 'https://github.com/sathwikhs17/fitness',
-          live: 'https://fitness-demo.com'
-        },
-        {
-          id: '5',
-          title: 'AI Image Generator',
-          description: 'A web application that uses machine learning to generate unique images based on text descriptions.',
-          image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2065&auto=format&fit=crop',
-          technologies: ['Python', 'TensorFlow', 'React', 'Flask'],
-          category: 'ai',
-          github: 'https://github.com/sathwikhs17/ai-image',
-          live: 'https://ai-image-demo.com'
+          github: 'https://github.com/hs-sathwikhs/avora',
+          live: 'https://github.com/hs-sathwikhs/avora'
         },
         {
           id: '6',
-          title: 'Cryptocurrency Dashboard',
-          description: 'A real-time dashboard for tracking cryptocurrency prices, market trends, and portfolio performance.',
-          image: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=1974&auto=format&fit=crop',
-          technologies: ['React', 'Node.js', 'WebSockets', 'Chart.js'],
-          category: 'web',
-          github: 'https://github.com/sathwikhs17/crypto',
-          live: 'https://crypto-demo.com'
-        }
+          title: 'Resonatia',
+          description: 'Resonatia is a Python-Tkinter based music player that lets you browse and play your downloaded songs with a clean, minimal interface.',
+          image: 'https://images.unsplash.com/photo-1616356607338-fd87169ecf1a?q=80&w=1470&auto=format&fit=crop',
+          technologies: ['Python', 'File Handling', 'Pygame', 'Tkinter'],
+          category: 'python',
+          github: '#',
+          live: '#'
+        },
       ];
       
       setProjects(projectsData);
@@ -304,16 +304,22 @@ const AllProjects = () => {
               Web
             </FilterButton>
             <FilterButton 
-              isActive={activeFilter === 'mobile'} 
-              onClick={() => handleFilterChange('mobile')}
+              isActive={activeFilter === 'networks'} 
+              onClick={() => handleFilterChange('networks')}
             >
-              Mobile
+              Networks
             </FilterButton>
             <FilterButton 
-              isActive={activeFilter === 'ai'} 
-              onClick={() => handleFilterChange('ai')}
+              isActive={activeFilter === 'blockchain'} 
+              onClick={() => handleFilterChange('blockchain')}
             >
-              AI/ML
+              Blockchain
+            </FilterButton>
+            <FilterButton 
+              isActive={activeFilter === 'python'} 
+              onClick={() => handleFilterChange('python')}
+            >
+              Python
             </FilterButton>
           </FilterContainer>
         </ScrollReveal>
