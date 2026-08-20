@@ -1,107 +1,191 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaGithub, FaLinkedin, FaTwitter, FaHeart, FaInstagram } from 'react-icons/fa';
+import { Shell, Meta, Quiet } from './ui/Primitives';
+import { profile } from '../data/profile';
 
-const FooterContainer = styled.footer`
-  position: relative;
-  background: ${props => props.theme.background};
-  padding: 2rem;
-  margin-top: auto;
-  border-top: 1px solid rgba(157, 78, 221, 0.1);
-  overflow: hidden;
+/**
+ * A colophon, not a link farm. Three columns of real information - where the
+ * work is made, what it contains, where else it lives - and a closing line of
+ * the kind a printed record carries and a website usually forgets.
+ */
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-    rgba(0, 0, 0, 0), 
-    rgba(0, 0, 0, 0)
-    ),
-    background: url('https://images.unsplash.com/photo-1545987796-200677ee1011?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
-    background-size: cover;
-    opacity: 0.02;
-    z-index: 0;
+const Foot = styled.footer`
+  border-top: 1px solid ${(p) => p.theme.ruleStrong};
+  background: ${(p) => p.theme.paper2};
+  padding-block: clamp(3rem, 7vh, 4.5rem) 2rem;
+`;
+
+const Grid = styled.div`
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  align-items: start;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 460px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 `;
 
-const FooterContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-  z-index: 1;
+const Signature = styled.div`
+  @media (max-width: 760px) {
+    grid-column: 1 / -1;
+  }
+
+  b {
+    display: block;
+    font-family: ${(p) => p.theme.font.display};
+    font-weight: ${(p) => p.theme.displayWeightBold};
+    font-size: ${(p) => p.theme.type.d4};
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: ${(p) => p.theme.ink};
+  }
+
+  address {
+    margin-top: 0.75rem;
+    font-style: normal;
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
+  }
 `;
 
-const SocialLinks = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
+const Column = styled.nav`
+  display: grid;
+  gap: 0.85rem;
+  align-content: start;
+
+  ul {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  li {
+    font-size: ${(p) => p.theme.type.small};
+    color: ${(p) => p.theme.graphite};
+  }
 
   a {
-    color: ${props => props.theme.textSecondary};
-    font-size: 1.5rem;
-    transition: color 0.3s ease;
+    color: ${(p) => p.theme.graphite};
+    text-decoration: none;
+    transition: color var(--dur-hover) var(--ease-out);
 
-    &:hover {
-      color: ${props => props.theme.primary};
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: ${(p) => p.theme.ink};
+      }
     }
   }
 `;
 
-const Copyright = styled.p`
-  color: ${props => props.theme.textSecondary};
-  text-align: center;
-  font-size: 0.9rem;
+const Handle = styled.span`
+  font-family: ${(p) => p.theme.font.mono};
+  font-size: ${(p) => p.theme.type.micro};
+  color: ${(p) => p.theme.graphite};
+  margin-left: 0.4rem;
 `;
 
-const MadeWith = styled.p`
-  color: ${props => props.theme.textSecondary};
+const Rule = styled.div`
+  height: 1px;
+  background: ${(p) => p.theme.rule};
+  margin-block: clamp(2.5rem, 6vh, 3.5rem) 1.25rem;
+`;
+
+const Base = styled.div`
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  
-  svg {
-    color: ${props => props.theme.primary};
+  flex-wrap: wrap;
+  gap: 0.65rem 1.75rem;
+  align-items: baseline;
+`;
+
+const Colophon = styled.p`
+  margin-left: auto;
+  max-width: 44ch;
+  font-family: ${(p) => p.theme.font.mono};
+  font-size: ${(p) => p.theme.type.micro};
+  line-height: 1.65;
+  color: ${(p) => p.theme.graphite};
+
+  @media (max-width: 700px) {
+    margin-left: 0;
   }
 `;
 
-const Footer = () => {
-  const currentYear = new Date().getFullYear();
+const SECTIONS = [
+  { label: 'Work', to: '/#work' },
+  { label: 'Record', to: '/#record' },
+  { label: 'Stack', to: '/#stack' },
+  { label: 'Contact', to: '/#contact' },
+  { label: 'All projects', to: '/projects' },
+];
+
+export default function Footer() {
+  const year = new Date().getFullYear();
 
   return (
-    <FooterContainer>
-      <FooterContent>
-        <SocialLinks>
-          <a href="https://github.com/hs-sathwikhs" target="_blank" rel="noopener noreferrer">
-            <FaGithub />
-          </a>
-          <a href="https://linkedin.com/in/hs-sathwikhs" target="_blank" rel="noopener noreferrer">
-            <FaLinkedin />
-          </a>
-          <a href="https://twitter.com/sathwikhss" target="_blank" rel="noopener noreferrer">
-            <FaTwitter />
-          </a>
-          <a href="https://instagram.com/sathwikhs17" target="_blank" rel="noopener noreferrer">
-            <FaInstagram />
-          </a>
-        </SocialLinks>
-        <Copyright>
-          © {currentYear} Sathwik HS. All rights reserved.
-        </Copyright>
-        <MadeWith>
-          Made with <FaHeart /> in Bengaluru, India
-        </MadeWith>
-      </FooterContent>
-    </FooterContainer>
-  );
-};
+    <Foot>
+      <Shell>
+        <Grid>
+          <Signature>
+            <b>{profile.name}</b>
+            <address>
+              <Meta>{profile.city}</Meta>
+              <Meta>{profile.coordinates}</Meta>
+            </address>
+          </Signature>
 
-export default Footer;
+          <Column aria-label="Sections">
+            <Meta>Index</Meta>
+            <ul>
+              {SECTIONS.map(({ label, to }) => (
+                <li key={to}>
+                  <Link to={to}>{label}</Link>
+                </li>
+              ))}
+            </ul>
+          </Column>
+
+          <Column aria-label="Elsewhere">
+            <Meta>Elsewhere</Meta>
+            <ul>
+              {profile.social.map(({ label, handle, href }) => (
+                <li key={label}>
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {label}
+                    <Handle>{handle}</Handle>
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a href={`mailto:${profile.email}`}>Email</a>
+              </li>
+            </ul>
+          </Column>
+        </Grid>
+
+        <Rule />
+
+        <Base>
+          <Meta>
+            © {year} {profile.name}
+          </Meta>
+          <Meta>
+            Source on{' '}
+            <Quiet
+              href="https://github.com/hs-sathwikhs/Portfolio"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </Quiet>
+          </Meta>
+        </Base>
+      </Shell>
+    </Foot>
+  );
+}

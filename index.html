@@ -1,21 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="paper">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sathwik HS - Security &amp; systems</title>
+    <meta
+      name="description"
+      content="Sathwik HS builds systems and takes them apart: a RAFT consensus cluster, a terrain classifier trained on a robot's own gait, a firewalled bank topology, on-chain credentials. CSE undergrad at PES University, CTF team co-founder, in Bengaluru."
+    />
+    <meta name="author" content="Sathwik HS" />
+    <link rel="canonical" href="https://sathwikhs.vercel.app/" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>Sathwik HS</title>
-    <style>
-      body {
-        background: #1c1c28;
-        color: #fff;
-        margin: 0;
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#E7E8EA" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sathwik HS" />
+    <meta property="og:title" content="Sathwik HS - Security &amp; systems" />
+    <meta
+      property="og:description"
+      content="A record of work: a RAFT cluster that keeps its log, gait telemetry classified into terrain, a CoAP-to-MQTT bridge in C, credentials nobody can forge - and the capture-the-flag practice alongside it."
+    />
+    <meta property="og:url" content="https://sathwikhs.vercel.app/" />
+    <meta property="og:image" content="https://sathwikhs.vercel.app/og.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sathwik HS - security and systems, Bengaluru." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@sathwikhss" />
+
+    <!--
+      Paint the colour mode before the first frame. Without this, a visitor who
+      chose TRACE gets one flash of light paper on every reload, which is the
+      one thing a theme toggle must never do. Kept inline and tiny on purpose:
+      it has to run before the stylesheet, so it cannot be a module.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('sathwikhs.mode');
+          var mode =
+            stored === 'paper' || stored === 'trace'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'trace'
+                : 'paper';
+          var root = document.documentElement;
+          root.dataset.theme = mode;
+          root.style.colorScheme = mode === 'trace' ? 'dark' : 'light';
+          root.style.background = mode === 'trace' ? '#0E0F11' : '#E7E8EA';
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', mode === 'trace' ? '#0E0F11' : '#E7E8EA');
+        } catch (e) {
+          /* Storage blocked. The light palette is the default and is correct. */
+        }
+      })();
+    </script>
+
+    <!--
+      Kept in step with src/data - and with the same honesty rule. `worksFor` is
+      absent because the C-ISFCR internship ended in July 2025 and that property
+      asserts a present employer; the internship is stated in the record on the
+      page, with its dates, where it can be read as past tense.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Sathwik HS",
+        "url": "https://sathwikhs.vercel.app/",
+        "jobTitle": "Computer Science undergraduate",
+        "affiliation": { "@type": "CollegeOrUniversity", "name": "PES University" },
+        "alumniOf": { "@type": "CollegeOrUniversity", "name": "PES University" },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressCountry": "IN"
+        },
+        "email": "mailto:hs.sathwikhs@gmail.com",
+        "knowsAbout": [
+          "Computer security",
+          "Capture the flag",
+          "Distributed systems",
+          "Computer networks",
+          "Socket programming",
+          "Machine learning",
+          "Full-stack web development",
+          "Blockchain"
+        ],
+        "sameAs": [
+          "https://github.com/hs-sathwikhs",
+          "https://linkedin.com/in/hs-sathwikhs",
+          "https://twitter.com/sathwikhss"
+        ]
       }
-    </style>
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      This site renders its content with JavaScript. With it disabled, the record is still readable
+      at <a href="https://github.com/hs-sathwikhs/Portfolio">github.com/hs-sathwikhs/Portfolio</a>,
+      or write to <a href="mailto:hs.sathwikhs@gmail.com">hs.sathwikhs@gmail.com</a>.
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
-</html> 
+</html>

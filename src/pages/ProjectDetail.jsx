@@ -1,461 +1,413 @@
-import { useEffect, useState, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { FaGithub, FaExternalLinkAlt, FaArrowLeft, FaCalendarAlt, FaCode, FaLightbulb } from 'react-icons/fa';
-import ScrollReveal from '../components/common/ScrollReveal';
+import {
+  Shell,
+  Meta,
+  SectionRule,
+  TagRow,
+  Tag,
+  Action,
+  Absent,
+  Prose,
+  Quiet,
+} from '../components/ui/Primitives';
+import Reveal from '../components/ui/Reveal';
+import Diagram from '../components/Diagram';
+import { projects, findProject } from '../data/projects';
 
-const ProjectDetailSection = styled.section`
-  background: ${props => props.theme.surface};
-  min-height: 100vh;
-  overflow: hidden;
+/**
+ * One record per project.
+ *
+ * The old version of this page held its own hard-coded array of three projects
+ * that existed nowhere else on the site, so /project/4 served something that
+ * was never real. This page reads the same list as everything else, and a key
+ * that does not resolve says so.
+ */
+
+const Head = styled.header`
+  padding-block: clamp(6.5rem, 15vh, 9rem) 0;
 `;
 
-const ProjectHeader = styled.div`
-  position: relative;
-  height: 60vh;
-  min-height: 400px;
-  max-height: 600px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.8) 100%);
-    z-index: 1;
-  }
-`;
-
-const ParallaxImage = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url(${props => props.image});
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-`;
-
-const HeaderContent = styled.div`
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  color: white;
-  padding: 0 2rem;
-  max-width: 1000px;
-`;
-
-const ProjectTitle = styled.h1`
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  margin-bottom: 1rem;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-`;
-
-const ProjectTagline = styled.p`
-  font-size: clamp(1.1rem, 3vw, 1.5rem);
-  margin-bottom: 2rem;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-`;
-
-const ProjectContent = styled.div`
-  max-width: 1000px;
-  margin: -80px auto 0;
-  width: 100%;
-  padding: 0 1rem 5rem;
-  position: relative;
-  z-index: 3;
-  
-  @media (min-width: 768px) {
-    padding: 0 2rem 5rem;
-  }
-`;
-
-const ContentCard = styled.div`
-  background: ${props => props.theme.background};
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 2rem;
-`;
-
-const BackButton = styled(Link)`
+const Back = styled(Link)`
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  color: white;
+  gap: 0.55rem;
+  font-family: ${(p) => p.theme.font.mono};
+  font-size: ${(p) => p.theme.type.label};
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${(p) => p.theme.graphite};
   text-decoration: none;
-  margin-bottom: 2rem;
-  transition: color 0.2s ease;
-  font-weight: 500;
-  
-  &:hover {
-    color: ${props => props.theme.primary};
-  }
-`;
+  transition: color var(--dur-hover) var(--ease-out);
 
-const ProjectDescription = styled.div`
-  padding: 2rem;
-  
-  p {
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
-    color: ${props => props.theme.textSecondary};
-    font-size: 1.1rem;
+  &::before {
+    content: '';
+    width: 1.1rem;
+    height: 1px;
+    background: currentColor;
   }
-`;
 
-const ProjectMeta = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  padding: 0 2rem 2rem;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const MetaSection = styled.div`
-  h3 {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-    color: ${props => props.theme.text};
-    border-bottom: 2px solid ${props => props.theme.border};
-    padding-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    
-    svg {
-      color: ${props => props.theme.primary};
-    }
-  }
-`;
-
-const TechList = styled.ul`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  list-style: none;
-  padding: 0;
-`;
-
-const TechItem = styled.li`
-  background: ${props => props.theme.primary}33;
-  color: ${props => props.theme.primary};
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: ${props => props.theme.primary}66;
-    transform: translateY(-2px);
-  }
-`;
-
-const FeatureList = styled.ul`
-  padding-left: 1.5rem;
-  
-  li {
-    margin-bottom: 1rem;
-    color: ${props => props.theme.textSecondary};
-    position: relative;
-    padding-left: 0.5rem;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 0.5rem;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: ${props => props.theme.primary};
-    }
-  }
-`;
-
-const ChallengesSection = styled.div`
-  padding: 2rem;
-  background: ${props => props.theme.background};
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  
-  h3 {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-    color: ${props => props.theme.text};
-    border-bottom: 2px solid ${props => props.theme.border};
-    padding-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    
-    svg {
-      color: ${props => props.theme.primary};
-    }
-  }
-  
-  p {
-    line-height: 1.8;
-    color: ${props => props.theme.textSecondary};
-  }
-`;
-
-const ProjectLinks = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
-  
-  a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.5rem;
-    background: ${props => props.theme.primary};
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(157, 78, 221, 0.3);
-    
+  @media (hover: hover) and (pointer: fine) {
     &:hover {
-      background: ${props => props.theme.secondary};
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(157, 78, 221, 0.4);
-    }
-    
-    &.outline {
-      background: transparent;
-      color: ${props => props.theme.primary};
-      border: 2px solid ${props => props.theme.primary};
-      
-      &:hover {
-        background: ${props => props.theme.primary};
-        color: white;
-      }
+      color: ${(p) => p.theme.seal};
     }
   }
 `;
 
-const LoadingWrapper = styled.div`
+const Title = styled.h1`
+  margin-top: 1.5rem;
+  font-size: ${(p) => p.theme.type.d2};
+  max-width: 24ch;
+`;
+
+const Summary = styled.p`
+  margin-top: 1.25rem;
+  max-width: 54ch;
+  font-family: ${(p) => p.theme.font.display};
+  font-size: ${(p) => p.theme.type.d4};
+  font-weight: ${(p) => p.theme.displayWeight};
+  line-height: 1.35;
+  color: ${(p) => p.theme.ink};
+`;
+
+const Links = styled.div`
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
-  min-height: 50vh;
-  font-size: 1.2rem;
-  color: ${props => props.theme.textSecondary};
+  gap: 0.75rem 1.5rem;
+  margin-top: clamp(1.5rem, 3.5vh, 2rem);
 `;
 
-const ProjectDetail = () => {
-  const { id } = useParams();
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const headerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: headerRef,
-    offset: ["start start", "end start"]
-  });
-  
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5]);
-  
-  useEffect(() => {
-    const fetchProject = () => {
-      setLoading(true);
-      
-      const projects = [
-        {
-          id: '1',
-          title: 'E-Commerce Platform',
-          description: 'A full-featured e-commerce platform with product listings, cart functionality, and secure checkout.',
-          longDescription: 'This comprehensive e-commerce solution provides businesses with everything they need to sell products online. Built with React on the frontend and Node.js on the backend, it offers a seamless shopping experience for customers and powerful management tools for store owners.',
-          image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop',
-          technologies: ['React', 'Node.js', 'MongoDB', 'Express', 'Redux', 'Stripe API'],
-          features: [
-            'User authentication and profile management',
-            'Product catalog with categories and search functionality',
-            'Shopping cart and wishlist',
-            'Secure payment processing with Stripe',
-            'Order tracking and history',
-            'Admin dashboard for inventory management'
-          ],
-          challenges: "One of the main challenges was implementing a secure payment system that complied with international regulations while maintaining a smooth user experience. We solved this by integrating Stripe's API and creating a custom checkout flow.",
-          github: 'https://github.com/sathwikhs17/ecommerce',
-          live: 'https://ecommerce-demo.com'
-        },
-        {
-          id: '2',
-          title: 'Task Management App',
-          description: 'A productivity app for managing tasks, projects, and deadlines with team collaboration features.',
-          longDescription: 'This task management application helps teams stay organized and productive. It allows users to create projects, assign tasks, set deadlines, and track progress. The app includes real-time updates and notifications to keep everyone in sync.',
-          image: 'https://images.unsplash.com/photo-1540350394557-8d14678e7f91?q=80&w=2032&auto=format&fit=crop',
-          technologies: ['React', 'Firebase', 'Material UI', 'Redux', 'Cloud Functions'],
-          features: [
-            'Project and task creation with custom categories',
-            'Task assignment and deadline management',
-            'Progress tracking with Kanban boards',
-            'Team collaboration with comments and file sharing',
-            'Real-time notifications',
-            'Calendar integration and reminders'
-          ],
-          challenges: "Implementing real-time updates across multiple devices was challenging. We used Firebase's real-time database and carefully designed our data structure to ensure efficient updates without overwhelming the client devices.",
-          github: 'https://github.com/sathwikhs17/taskmanager',
-          live: 'https://taskmanager-demo.com'
-        },
-        {
-          id: '3',
-          title: 'Weather Dashboard',
-          description: 'A weather application that provides real-time forecasts, historical data, and interactive maps.',
-          longDescription: 'This weather dashboard gives users accurate weather information with a beautiful, intuitive interface. It pulls data from multiple weather APIs to provide current conditions, forecasts, and historical weather patterns. The interactive maps allow users to explore weather patterns visually.',
-          image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?q=80&w=2070&auto=format&fit=crop',
-          technologies: ['JavaScript', 'Weather API', 'Chart.js', 'CSS', 'Leaflet Maps'],
-          features: [
-            'Current weather conditions for any location',
-            'Five-day forecast with hourly breakdowns',
-            'Historical weather data visualization',
-            'Interactive weather maps',
-            'Location-based automatic weather updates',
-            'Weather alerts and notifications'
-          ],
-          challenges: "Combining data from multiple weather APIs with different formats and update frequencies was complex. We created a unified data model and implemented caching strategies to ensure consistent, up-to-date information while minimizing API calls.",
-          github: 'https://github.com/sathwikhs17/weather',
-          live: 'https://weather-demo.com'
-        }
-      ];
-      
-      const foundProject = projects.find(p => p.id === id);
-      
-      if (foundProject) {
-        setProject(foundProject);
-      }
-      
-      setLoading(false);
-    };
-    
-    fetchProject();
-    
-    window.scrollTo(0, 0);
-  }, [id]);
-  
-  if (loading) {
-    return (
-      <ProjectDetailSection>
-        <ProjectContent>
-          <LoadingWrapper>Loading project details...</LoadingWrapper>
-        </ProjectContent>
-      </ProjectDetailSection>
-    );
+/** The diagram is the largest thing on the page, because it explains the most. */
+const Figure = styled.figure`
+  margin-top: clamp(2.5rem, 6vh, 3.5rem);
+  border: 1px solid ${(p) => p.theme.ruleStrong};
+  background: ${(p) => p.theme.paper2};
+  padding: clamp(1rem, 3vw, 2.25rem);
+
+  figcaption {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid ${(p) => p.theme.rule};
+    max-width: 62ch;
+    font-size: ${(p) => p.theme.type.small};
+    color: ${(p) => p.theme.graphite};
   }
-  
+`;
+
+const Body = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  margin-top: clamp(3rem, 7vh, 4.5rem);
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+/**
+ * Each block is wrapped in its own Reveal, so the blocks are never siblings and
+ * an `& + &` rule on Block would never match. The spacing lives on the column
+ * that holds the wrappers instead.
+ */
+const Blocks = styled.div`
+  > * + * {
+    margin-top: clamp(2.5rem, 6vh, 3.5rem);
+  }
+`;
+
+const Block = styled.section`
+  h2 {
+    font-size: ${(p) => p.theme.type.d3};
+    margin-bottom: 1.1rem;
+  }
+`;
+
+/**
+ * Where a repository's README claims more than its code delivers, this is where
+ * the difference is stated - in the main column, at the same weight as the rest
+ * of the record, not as a footnote in the sidebar.
+ *
+ * It carries the seal on a left rule rather than a tinted "warning" panel. A
+ * warning panel would read as an apology, and this is not one: it is the same
+ * kind of statement as every other block on the page, which is the point. A
+ * reader who opens the source and finds the gap themselves has learned
+ * something worse than the gap.
+ */
+const Stated = styled.section`
+  border-left: 2px solid ${(p) => p.theme.seal};
+  padding-left: clamp(1rem, 2.5vw, 1.5rem);
+
+  h2 {
+    font-size: ${(p) => p.theme.type.d4};
+    margin-bottom: 0.85rem;
+  }
+
+  p {
+    max-width: 62ch;
+    font-size: ${(p) => p.theme.type.small};
+    color: ${(p) => p.theme.graphite};
+  }
+`;
+
+const Side = styled.aside`
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+  border-top: 1px solid ${(p) => p.theme.ruleStrong};
+  padding-top: 1.25rem;
+
+  section {
+    display: grid;
+    gap: 0.6rem;
+  }
+`;
+
+/** Line items on a specification, not bullet points. */
+const List = styled.ul`
+  display: grid;
+  gap: 0.7rem;
+  border-top: 1px solid ${(p) => p.theme.rule};
+
+  li {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding-top: 0.7rem;
+    border-bottom: 1px solid ${(p) => p.theme.rule};
+    padding-bottom: 0.7rem;
+    font-size: ${(p) => p.theme.type.small};
+    color: ${(p) => p.theme.ink};
+  }
+`;
+
+const Ends = styled.nav`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-block: clamp(3.5rem, 8vh, 5rem) ${(p) => p.theme.space.section};
+  border-block: 1px solid ${(p) => p.theme.ruleStrong};
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+  }
+`;
+
+const End = styled(Link)`
+  display: grid;
+  gap: 0.5rem;
+  padding: clamp(1.25rem, 3vh, 1.75rem) 0;
+  text-decoration: none;
+  transition: background-color var(--dur-hover) var(--ease-out);
+
+  &:last-child {
+    text-align: right;
+    justify-items: end;
+
+    @media (max-width: 560px) {
+      text-align: left;
+      justify-items: start;
+      border-top: 1px solid ${(p) => p.theme.rule};
+    }
+  }
+
+  b {
+    font-family: ${(p) => p.theme.font.display};
+    font-weight: ${(p) => p.theme.displayWeight};
+    font-size: ${(p) => p.theme.type.d4};
+    transition: color var(--dur-hover) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: ${(p) => p.theme.paperInk};
+    }
+
+    &:hover b {
+      color: ${(p) => p.theme.seal};
+    }
+  }
+`;
+
+const Missing = styled.section`
+  padding-block: clamp(7rem, 18vh, 11rem) ${(p) => p.theme.space.section};
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+
+  p {
+    max-width: 48ch;
+    color: ${(p) => p.theme.graphite};
+  }
+`;
+
+const LABELS = { source: 'Source', live: 'Live site' };
+
+export default function ProjectDetail() {
+  const { id } = useParams();
+  const project = findProject(id);
+
   if (!project) {
     return (
-      <ProjectDetailSection>
-        <ProjectContent>
-          <BackButton to="/projects">
-            <FaArrowLeft /> Back to Projects
-          </BackButton>
-          <h1>Project not found</h1>
-          <p>Sorry, the project you're looking for doesn't exist.</p>
-        </ProjectContent>
-      </ProjectDetailSection>
+      <Shell>
+        <Missing>
+          <Meta $seal>No such record</Meta>
+          <h1>That project is not in the index.</h1>
+          <p>
+            {projects.length} projects are on file, and <code>{id}</code> is not one of them. The
+            index lists all of them.
+          </p>
+          <Action as={Link} to="/projects" $primary>
+            Open the index
+          </Action>
+        </Missing>
+      </Shell>
     );
   }
-  
-  return (
-    <ProjectDetailSection>
-      <ProjectHeader ref={headerRef}>
-        <ParallaxImage 
-          image={project.image}
-          style={{ y, opacity }}
-        />
-        <HeaderContent>
-          <BackButton to="/projects">
-            <FaArrowLeft /> Back to Projects
-          </BackButton>
-          <ProjectTitle>{project.title}</ProjectTitle>
-          <ProjectTagline>{project.description}</ProjectTagline>
-        </HeaderContent>
-      </ProjectHeader>
-      
-      <ProjectContent>
-        <ScrollReveal>
-          <ContentCard>
-            <ProjectDescription>
-              <p>{project.longDescription}</p>
-            </ProjectDescription>
-            
-            <ProjectMeta>
-              <MetaSection>
-                <h3><FaCode /> Technologies Used</h3>
-                <TechList>
-                  {project.technologies.map((tech, index) => (
-                    <TechItem key={index}>{tech}</TechItem>
-                  ))}
-                </TechList>
-              </MetaSection>
-              
-              <MetaSection>
-                <h3><FaCalendarAlt /> Key Features</h3>
-                <FeatureList>
-                  {project.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </FeatureList>
-              </MetaSection>
-            </ProjectMeta>
-          </ContentCard>
-        </ScrollReveal>
-        
-        <ScrollReveal delay={0.2}>
-          <ChallengesSection>
-            <h3><FaLightbulb /> Challenges & Solutions</h3>
-            <p>{project.challenges}</p>
-          </ChallengesSection>
-        </ScrollReveal>
-        
-        <ScrollReveal delay={0.3}>
-          <ProjectLinks>
-            <motion.a 
-              href={project.github} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              whileHover={{ y: -3 }}
-              whileTap={{ y: 0 }}
-              className="outline"
-            >
-              <FaGithub /> View Code
-            </motion.a>
-            <motion.a 
-              href={project.live} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              whileHover={{ y: -3 }}
-              whileTap={{ y: 0 }}
-            >
-              <FaExternalLinkAlt /> Live Demo
-            </motion.a>
-          </ProjectLinks>
-        </ScrollReveal>
-      </ProjectContent>
-    </ProjectDetailSection>
-  );
-};
 
-export default ProjectDetail; 
+  const at = projects.findIndex((p) => p.id === project.id);
+  const prev = at > 0 ? projects[at - 1] : null;
+  const next = at < projects.length - 1 ? projects[at + 1] : null;
+
+  return (
+    <Shell>
+      <Head>
+        <Back to="/projects">All projects</Back>
+        <Title>{project.title}</Title>
+        <Summary>{project.summary}</Summary>
+
+        <Links>
+          {project.links.map((link) =>
+            link.href ? (
+              <Action
+                key={link.kind}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                $primary={link.kind === 'live'}
+              >
+                {LABELS[link.kind]}
+              </Action>
+            ) : (
+              <Absent key={link.kind}>{link.unavailable}</Absent>
+            ),
+          )}
+        </Links>
+      </Head>
+
+      <Reveal>
+        <Figure>
+          <Diagram kind={project.diagram} />
+          <figcaption>How it is put together, drawn rather than described.</figcaption>
+        </Figure>
+      </Reveal>
+
+      <Body>
+        <Blocks>
+          <Reveal>
+            <Block>
+              <h2>What it is</h2>
+              <Prose>
+                {project.brief.map((para) => (
+                  <p key={para.slice(0, 32)}>{para}</p>
+                ))}
+              </Prose>
+            </Block>
+          </Reveal>
+
+          <Reveal>
+            <Block>
+              <h2>What it does</h2>
+              <List>
+                {project.work.map((line, i) => (
+                  <li key={line}>
+                    <Meta as="span">{String(i + 1).padStart(2, '0')}</Meta>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </List>
+            </Block>
+          </Reveal>
+
+          {project.caveat ? (
+            <Reveal>
+              <Stated>
+                <h2>What it doesn’t do yet</h2>
+                <p>{project.caveat}</p>
+              </Stated>
+            </Reveal>
+          ) : null}
+
+          <Reveal>
+            <Block>
+              <h2>The problem, and what it cost</h2>
+              <Prose>
+                <p>{project.problem}</p>
+              </Prose>
+            </Block>
+          </Reveal>
+        </Blocks>
+
+        <Side>
+          <section>
+            <Meta $seal>Domain</Meta>
+            <SectionRule index={String(at + 1).padStart(2, '0')} name={project.domain} />
+          </section>
+
+          <section>
+            <Meta>Built with</Meta>
+            <TagRow>
+              {project.stack.map((item) => (
+                <Tag key={item}>{item}</Tag>
+              ))}
+            </TagRow>
+          </section>
+
+          {project.context ? (
+            <section>
+              <Meta>Context</Meta>
+              <p style={{ fontSize: '0.875rem' }}>{project.context}</p>
+            </section>
+          ) : null}
+
+          <section>
+            <Meta>Availability</Meta>
+            {project.links.map((link) => (
+              <p key={link.kind} style={{ fontSize: '0.875rem' }}>
+                {link.href ? (
+                  <Quiet href={link.href} target="_blank" rel="noopener noreferrer">
+                    {LABELS[link.kind]}
+                  </Quiet>
+                ) : (
+                  <Absent>{link.unavailable}</Absent>
+                )}
+              </p>
+            ))}
+          </section>
+        </Side>
+      </Body>
+
+      <Ends aria-label="Adjacent projects">
+        {prev ? (
+          <End to={`/project/${prev.slug}`}>
+            <Meta>Previous</Meta>
+            <b>{prev.title}</b>
+          </End>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <End to={`/project/${next.slug}`}>
+            <Meta>Next</Meta>
+            <b>{next.title}</b>
+          </End>
+        ) : (
+          <span />
+        )}
+      </Ends>
+    </Shell>
+  );
+}

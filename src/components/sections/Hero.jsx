@@ -1,694 +1,229 @@
-import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
-import Button from '../common/Button';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Shell, Meta, Action } from '../ui/Primitives';
+import { profile } from '../../data/profile';
 
-const HeroSection = styled.section`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  margin-top: 60px;
+/**
+ * The head of a record, not a stage.
+ *
+ * Everything the old hero used to say with motion - a particle field, a
+ * rotating gradient, three floating shapes, a typewriter cycling three job
+ * titles - is said here by type size and one line of provenance instead. The
+ * only movement is the entry, and it happens once.
+ */
+
+const Head = styled.section`
   position: relative;
-  overflow: hidden;
-  
-  @media (min-width: 768px) {
-    padding: 0 2rem;    
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-    rgba(0, 0, 0, 0.02), 
-    rgba(0, 0, 0, 0.02)
-    ),
-    
-    background-size: cover;
-    background-position: center;
-    opacity: 0.02;
-    z-index: 1;
+  padding-block: clamp(7.5rem, 18vh, 11rem) clamp(3rem, 7vh, 4.5rem);
+`;
+
+const Split = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: end;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: clamp(2.25rem, 6vh, 3rem);
   }
 `;
 
-const GradientBackground = styled(motion.div)`
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle at center,
-    rgba(157, 78, 221, 0.05) 0%,
-    rgba(157, 78, 221, 0.02) 40%,
-    rgba(0, 0, 0, 0) 70%
-  );
-  z-index: -1;
-  pointer-events: none;
-`;
-
-const ParticleCanvas = styled.canvas`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-`;
-
-const HeroContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 2rem;
-  padding: 2rem 0;
-  
-  @media (min-width: 768px) {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    align-items: center;
-    padding: 3rem 0;
-  }
-`;
-
-const HeroInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  
-  @media (min-width: 768px) {
-    text-align: left;
-  }
-`;
-
-const ProfileImageContainer = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
-  perspective: 1000px;
-  
-  @media (min-width: 768px) {
-    margin-top: 0;
-  }
-`;
-
-const ProfileImageWrapper = styled(motion.div)`
-  position: relative;
-  transform-style: preserve-3d;
-  width: 250px;
-  height: 250px;
-  
-  @media (min-width: 992px) {
-    width: 300px;
-    height: 300px;
-  }
-`;
-
-const ProfileImage = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: url('/images/profile_pic.jpg') no-repeat;
-  background-size: cover;
-  background-position: center;
-  border: 4px solid ${props => props.theme.primary};
-  box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
-  position: relative;
-  transform-style: preserve-3d;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    border-top-color: ${props => props.theme.primary};
-    border-bottom-color: ${props => props.theme.primary};
-    opacity: 0.7;
-    animation: spin 8s linear infinite;
-  }
-  
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const ProfileImageGlow = styled(motion.div)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    ${props => props.theme.primary}33 0%,
-    transparent 70%
-  );
-  filter: blur(20px);
-  z-index: -1;
-`;
-
-const FloatingShape = styled(motion.div)`
-  position: absolute;
-  background: ${props => props.theme.primary}22;
-  border-radius: 50%;
-  z-index: -1;
-  
-  &.shape1 {
-    width: 80px;
-    height: 80px;
-    top: -20px;
-    left: 10%;
-  }
-  
-  &.shape2 {
-    width: 60px;
-    height: 60px;
-    bottom: 10%;
-    right: 5%;
-  }
-  
-  &.shape3 {
-    width: 40px;
-    height: 40px;
-    top: 30%;
-    right: 15%;
-  }
-`;
-
+/**
+ * The Didone's own italic carries the discipline line, so the two halves of the
+ * name read as one written gesture rather than two type choices.
+ */
 const Title = styled(motion.h1)`
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  margin-bottom: 0.25rem;
-  color: ${props => props.theme.textSecondary};
-  position: relative;
-  display: inline-block;
-  font-weight: normal;
-  font-family: var(--font-primary);
-  
-  @media (min-width: 768px) {
-    margin-bottom: 0.5rem;
+  line-height: 0.94;
+  max-width: 18ch;
+
+  i {
+    font-style: italic;
+    font-weight: inherit;
   }
 `;
 
-const NameTitle = styled(motion.div)`
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  margin-bottom: 1rem;
-  color: ${props => props.theme.primary};
-  position: relative;
-  display: inline-block;
-  font-weight: 800;
-  font-family: var(--font-secondary);
-  letter-spacing: -0.02em;
-  
-  @media (min-width: 768px) {
-    margin-bottom: 1.5rem;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, 
-      ${props => props.theme.primary}00, 
-      ${props => props.theme.primary}, 
-      ${props => props.theme.primary}00
-    );
-    border-radius: 2px;
-    transform-origin: left;
+const Lead = styled(motion.p)`
+  margin-top: clamp(1.5rem, 3.5vh, 2.25rem);
+  max-width: 34ch;
+  font-family: ${(p) => p.theme.font.display};
+  font-size: ${(p) => p.theme.type.d3};
+  font-weight: ${(p) => p.theme.displayWeight};
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  color: ${(p) => p.theme.ink};
+  text-wrap: pretty;
+`;
+
+const Body = styled(motion.div)`
+  margin-top: 1.35rem;
+  max-width: 56ch;
+  font-size: ${(p) => p.theme.type.body};
+  color: ${(p) => p.theme.graphite};
+
+  p + p {
+    margin-top: 0.9em;
   }
 `;
 
-const Subtitle = styled(motion.h2)`
-  font-size: clamp(1.2rem, 4vw, 2rem);
-  margin-bottom: 1.5rem;
-  color: ${props => props.theme.textSecondary};
-  font-family: var(--font-accent);
-  font-weight: 500;
-  
-  @media (min-width: 768px) {
-    margin-bottom: 2rem;
-  }
-`;
-
-const TypewriterContainer = styled.div`
-  display: inline-block;
-  min-width: 280px;
-  height: 1.2em;
-  position: relative;
-  text-align: left;
-  overflow: visible;
-  
-  @media (min-width: 768px) {
-    min-width: 320px;
-    height: 1.2em;
-  }
-`;
-
-const TypewriterText = styled(motion.span)`
-  position: absolute;
-  white-space: nowrap;
-  
-  &::after {
-    content: '|';
-    position: absolute;
-    right: -8px;
-    top: 0;
-    animation: blink 1s step-end infinite;
-  }
-  
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-`;
-
-const Location = styled(motion.p)`
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
-  color: ${props => props.theme.accent};
-  margin-bottom: 1rem;
+const Actions = styled(motion.div)`
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  font-family: var(--font-primary);
-  font-weight: 500;
-  
-  @media (min-width: 768px) {
-    margin-bottom: 1.5rem;
-    justify-content: flex-start;
-  }
-  
-  span {
-    display: inline-block;
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-`;
-
-const Description = styled(motion.p)`
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
-  max-width: 600px;
-  margin-bottom: 1.5rem;
-  line-height: 1.8;
-  color: ${props => props.theme.textSecondary};
-  position: relative;
-  font-family: var(--font-primary);
-  
-  @media (min-width: 768px) {
-    margin-bottom: 2rem;
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 0;
-    width: 40px;
-    height: 3px;
-    background: ${props => props.theme.primary}66;
-    border-radius: 3px;
-    
-    @media (max-width: 767px) {
-      left: 50%;
-      transform: translateX(-50%);
-    }
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
-  justify-content: center;
-  
-  @media (min-width: 480px) {
+  gap: 0.75rem;
+  margin-top: clamp(1.75rem, 4vh, 2.5rem);
+`;
+
+const Plate = styled(motion.figure)`
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  justify-self: end;
+
+  @media (max-width: 900px) {
+    justify-self: start;
+    max-width: 232px;
+  }
+
+  picture,
+  img {
+    display: block;
+    width: 100%;
+  }
+
+  img {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: 1px solid ${(p) => p.theme.ruleStrong};
+    /* Tone-matched to the paper rather than left as a raw camera JPEG sitting
+       on top of it. No ring, no glow, no spin. */
+    filter: saturate(0.88) contrast(1.03);
+    background: ${(p) => p.theme.paper2};
+  }
+
+  figcaption {
+    margin-top: 0.6rem;
+    display: flex;
+    justify-content: space-between;
     gap: 1rem;
   }
-  
-  @media (min-width: 768px) {
-    margin-bottom: 2rem;
-    justify-content: flex-start;
+`;
+
+const Strip = styled(motion.dl)`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: clamp(3rem, 8vh, 4.5rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid ${(p) => p.theme.ruleStrong};
+
+  @media (max-width: 620px) {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1.35rem;
+  }
+
+  dd {
+    margin-top: 0.4rem;
+    font-size: ${(p) => p.theme.type.small};
+    color: ${(p) => p.theme.ink};
   }
 `;
 
-const SocialLinks = styled.div`
-  display: flex;
-  gap: 1.25rem;
-  font-size: 1.25rem;
-  justify-content: center;
+const Live = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 
-  a {
-    color: ${props => props.theme.textSecondary};
-    transition: color 0.3s ease;
-    position: relative;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 2px;
-      background: ${props => props.theme.primary};
-      transition: width 0.3s ease;
-    }
-
-    &:hover {
-      color: ${props => props.theme.primary};
-      
-      &::before {
-        width: 100%;
-      }
-    }
-  }
-  
-  @media (min-width: 768px) {
-    gap: 1.5rem;
-    font-size: 1.5rem;
-    justify-content: flex-start;
+  /* A filled square, not a pulsing dot. It states a fact; it is not a
+     notification demanding to be dealt with. */
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: ${(p) => p.theme.seal};
   }
 `;
 
-const Hero = () => {
-  const canvasRef = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-100, 100], [10, -10]);
-  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
-  
-  const [displayText, setDisplayText] = useState('');
-  const [textIndex, setTextIndex] = useState(0);
-  const texts = ['Blockchain Developer', 'Full Stack Developer', 'Networks Enthusiast'];
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(150);
-  
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let particles = [];
-    
-    const setCanvasDimensions = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    
-    const initParticles = () => {
-      particles = [];
-      const particleCount = Math.floor(window.innerWidth / 10);
-      
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 2 + 1,
-          color: `rgba(157, 78, 221, ${Math.random() * 0.5 + 0.1})`,
-          speedX: Math.random() * 0.5 - 0.25,
-          speedY: Math.random() * 0.5 - 0.25
-        });
-      }
-    };
-    
-    const drawParticles = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(particle => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.fill();
-        
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        if (particle.y > canvas.height) particle.y = 0;
-      });
-      
-      particles.forEach((particle, i) => {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particle.x - particles[j].x;
-          const dy = particle.y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance < 100) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(157, 78, 221, ${0.2 * (1 - distance / 100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      });
-      
-      animationFrameId = requestAnimationFrame(drawParticles);
-    };
-    
-    const handleResize = () => {
-      setCanvasDimensions();
-      initParticles();
-    };
-    
-    setCanvasDimensions();
-    initParticles();
-    drawParticles();
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-  
-  useEffect(() => {
-    const currentText = texts[textIndex];
-    
-    const timer = setTimeout(() => {
-      if (!isDeleting) {
-        setDisplayText(currentText.substring(0, displayText.length + 1));
-        setTypingSpeed(150);
-        
-        if (displayText.length === currentText.length) {
-          setIsDeleting(true);
-          setTypingSpeed(1000);
-        }
-      } else {
-        setDisplayText(currentText.substring(0, displayText.length - 1));
-        setTypingSpeed(50);
-        
-        if (displayText.length === 0) {
-          setIsDeleting(false);
-          setTextIndex((textIndex + 1) % texts.length);
-          setTypingSpeed(500);
-        }
-      }
-    }, typingSpeed);
-    
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, textIndex, texts, typingSpeed]);
-  
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    x.set((e.clientX - centerX) / 5);
-    y.set((e.clientY - centerY) / 5);
-  };
-  
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
+export default function Hero() {
+  const reduce = useReducedMotion();
+
+  /** One entry, staggered by reading order. Nothing loops. */
+  const rise = (delay) => ({
+    initial: { opacity: 0, transform: `translateY(${reduce ? 0 : 20}px)` },
+    animate: { opacity: 1, transform: 'translateY(0px)' },
+    transition: {
+      duration: reduce ? 0.2 : 0.8,
+      delay: reduce ? 0 : delay,
+      ease: [0.23, 1, 0.32, 1],
+    },
+  });
 
   return (
-    <HeroSection id="home">
-      <GradientBackground 
-        animate={{ 
-          rotate: [0, 360],
-        }} 
-        transition={{ 
-          duration: 50, 
-          repeat: Infinity, 
-          ease: "linear" 
-        }} 
-      />
-      <ParticleCanvas ref={canvasRef} />
-      
-      <FloatingShape 
-        className="shape1"
-        animate={{ 
-          y: [0, 15, 0],
-          rotate: [0, 10, 0]
-        }}
-        transition={{ 
-          duration: 6, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-      />
-      
-      <FloatingShape 
-        className="shape2"
-        animate={{ 
-          y: [0, -15, 0],
-          rotate: [0, -10, 0]
-        }}
-        transition={{ 
-          duration: 7, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-      />
-      
-      <FloatingShape 
-        className="shape3"
-        animate={{ 
-          y: [0, 10, 0],
-          x: [0, 10, 0]
-        }}
-        transition={{ 
-          duration: 5, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-      />
-      
-      <HeroContent>
-        <HeroInfo>
-          <Title
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Hi, I'm 
-          </Title>
-          <NameTitle
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="text-gradient"
-          >
-            Sathwik HS
-          </NameTitle>
-          <Subtitle
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <TypewriterContainer>
-              <TypewriterText>{displayText}</TypewriterText>
-            </TypewriterContainer>
-          </Subtitle>
-          <Location
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-          >
-            <span>📍</span> Bengaluru, India
-          </Location>
-          <Description
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            I’m a CSE undergrad at PES University who enjoys turning clean UI into functional magic. 
-            Lately, I've been building a decentralized certification platform — because PDFs shouldn't be proof of anything. 
-            <br />I explore cross-protocol bridges too, mostly because the tech world’s full of brilliant systems that refuse to speak to each other. 
-            Somewhere between React components and Solidity contracts, I’m just trying to build stuff that’s simple, secure, and slightly ahead of its time.
-          </Description>
-          <ButtonGroup>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button as="a" href="#contact">
-                Contact Me
-              </Button>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button as="a" href="/resume.pdf" download variant="outline">
-                Download CV
-              </Button>
-            </motion.div>
-          </ButtonGroup>
-        </HeroInfo>
-        <ProfileImageContainer
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <ProfileImageWrapper
-            style={{
-              rotateX,
-              rotateY,
-              z: 100
-            }}
-          >
-            <ProfileImage />
-            <ProfileImageGlow 
-              animate={{ 
-                opacity: [0.5, 0.8, 0.5],
-                scale: [1, 1.05, 1],
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-            />
-          </ProfileImageWrapper>
-        </ProfileImageContainer>
-      </HeroContent>
-    </HeroSection>
-  );
-};
+    <Head>
+      <Shell>
+        <Split>
+          <div>
+            <Title {...rise(0)}>
+              {profile.name},
+              <br />
+              {/* The ampersand is bound to what follows it, so no line can end on
+                  a conjunction left hanging in 84px Didone. */}
+              <i>security</i> &amp;&nbsp;systems
+            </Title>
 
-export default Hero;
+            <Lead {...rise(0.08)}>{profile.standfirst[0]}</Lead>
+
+            <Body {...rise(0.12)}>
+              {profile.standfirst.slice(1).map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </Body>
+
+            <Actions {...rise(0.16)}>
+              <Action href="#work" $primary>
+                See the work
+              </Action>
+              <Action href={profile.resume} target="_blank" rel="noopener noreferrer">
+                Résumé (PDF)
+              </Action>
+            </Actions>
+          </div>
+
+          <Plate {...rise(0.24)}>
+            <picture>
+              <source srcSet={profile.portrait.webp} type="image/webp" />
+              <img
+                src={profile.portrait.jpg}
+                alt={profile.portrait.alt}
+                width="640"
+                height="800"
+                fetchPriority="high"
+                decoding="async"
+              />
+            </picture>
+            <figcaption>
+              <Meta>{profile.mark}</Meta>
+              <Meta>{profile.city}</Meta>
+            </figcaption>
+          </Plate>
+        </Split>
+
+        <Strip {...rise(0.32)}>
+          <div>
+            <Meta as="dt">Focus</Meta>
+            <dd>{profile.disciplines.join(' · ')}</dd>
+          </div>
+          <div>
+            <Meta as="dt">Based</Meta>
+            <dd>{profile.city}</dd>
+          </div>
+          <div>
+            <Meta as="dt">Status</Meta>
+            <dd>
+              <Live>Open to internships</Live>
+            </dd>
+          </div>
+        </Strip>
+      </Shell>
+    </Head>
+  );
+}

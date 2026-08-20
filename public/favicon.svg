@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="20" fill="#9D4EDD" />
-  <text x="50" y="70" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="white">S</text>
-</svg> 
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SHS">
+  <!--
+    A seal, not a logo. Oxblood on the light side, amber on the dark, matching
+    the two palettes the site itself flips between. Set in a grotesque rather
+    than the site's Didone, because a Didone's hairlines disappear at 16px.
+  -->
+  <style>
+    .field { fill: #7A1F2B; }
+    .mark  { fill: #F1F2F3; }
+    @media (prefers-color-scheme: dark) {
+      .field { fill: #D98A2B; }
+      .mark  { fill: #0E0F11; }
+    }
+  </style>
+  <rect class="field" width="64" height="64" rx="2" />
+  <text
+    class="mark"
+    x="32"
+    y="46"
+    text-anchor="middle"
+    font-family="Helvetica, Arial, system-ui, sans-serif"
+    font-size="40"
+    font-weight="700"
+  >S</text>
+</svg>
