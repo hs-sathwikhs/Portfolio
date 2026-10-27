@@ -5,3 +5,6 @@ dist
 .env
 *.log
 /notes
+/design/
+/PORTFOLIO_REDESIGN_CONTEXT.md
+/sathwik_portfolio_redesign_agent_prompt.md
