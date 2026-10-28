@@ -1,87 +1,148 @@
-/**
- * Single source of truth for every project surface: the ledger on the home
- * page, the index at /projects, and the record at /project/:id. Three separate
- * copies of this list is how the old site ended up serving a project that did
- * not exist.
- *
- * ORDER IS A RANKING. Entries are ordered by how well they stand up to someone
- * who opens the source: verifiable public code first, then institutional work
- * whose source is closed, then the rest. A project with no public artefact is
- * not promoted above one that has a repository a reader can actually read.
- *
- * LINK HONESTY: a link appears only where a destination was verified to
- * resolve. `unavailable` renders as plain disabled text with its reason - never
- * as a dead anchor to '#'.
- *
- * CLAIM HONESTY: where a repository's own README claims more than its code
- * does, this file states what the code does. `caveat` carries that, and it
- * renders on the project record. A portfolio that repeats an overclaim is worse
- * than one that never made it, because the reader can check.
- *
- * Verified 2026-08-20 against api.github.com:
- *   public + resolving  - CC_MiniRAFT, Terrain_Classification, AURA,
- *                         Blood_Donation_System, CTC-CaptureTheCalendar,
- *                         compit-pal, VaidyaDhara, Portfolio
- *   live demo resolving - ctcv1.vercel.app (200), sathwikhs.vercel.app (200)
- *   live demo 404       - compit-pal.vercel.app, so it is marked unavailable
- *   404 / private       - Bank_Network, Decentra-Cert, avora, Resonatia
- */
+// Shared project records. IDs and slugs remain stable for existing links.
 
 export const projects = [
   {
-    id: '1',
-    slug: 'mini-raft-board',
-    title: 'Mini-RAFT Board',
-    domain: 'Systems',
-    diagram: 'consensus',
-    summary:
-      'A collaborative drawing board that survives losing a node, backed by a three-replica RAFT cluster written from scratch rather than pulled in as a dependency.',
-    brief: [
-      'Strokes from every connected client are ordered through a hand-implemented RAFT cluster: leader election, log replication, and a commit that waits for a majority rather than for the leader alone. A stroke is only drawn once the cluster agrees it happened.',
-      'A WebSocket gateway sits in front of the three replicas and a replica that falls behind catches up through a log-sync endpoint, using the follower’s conflict index to find the point where the two logs diverged instead of replaying from zero.',
+    "id": "12",
+    "slug": "aethel",
+    "title": "Aethel",
+    "domain": "Security",
+    "diagram": "provenance",
+    "shortContext": "My focus: Hub & provenance · four-person team",
+    "summary": "Verified adapter sharing with a hardened Hub, append-only provenance, and independently checkable Merkle checkpoints.",
+    "brief": [
+      "Aethel keeps model adapters tied to their content hashes and pinned base-model references. Hub publication validates incoming artifacts before making them available for sharing.",
+      "The provenance layer records an append-only Merkle history. Exported proofs can be checked against independently configured EVM checkpoints, with IPFS mirrors for artifact distribution."
     ],
-    work: [
-      'Leader election and log replication implemented directly, not via a library',
-      'Commit requires a majority, so a single node cannot acknowledge a write alone',
-      'Catch-up sync that resumes from the divergence point, not from the start of the log',
-      'Five-service Docker Compose stack: gateway, three replicas, and the front end',
+    "work": [
+      "Configurable bearer-protected writes, bounded uploads and content-hash checks",
+      "Validated Hub publication and a nonce-based Content Security Policy",
+      "Append-only Merkle log with leaf-position and tree-size-bound proofs",
+      "Checkpoint verification against a configured chain, contract and log identity"
     ],
-    problem:
-      'Real-time collaboration is easy until a node dies mid-stroke. One authoritative server makes ordering trivial and makes the server a single point of failure; three peers with no consensus protocol makes them disagree about what was drawn. RAFT is the trade in between - writes cost a majority round trip, and in exchange the board keeps a single consistent history across a node loss.',
-    stack: ['Node.js', 'Express', 'WebSocket', 'RAFT', 'Docker', 'Nginx'],
-    links: [
-      { kind: 'source', href: 'https://github.com/hs-sathwikhs/CC_MiniRAFT' },
-      { kind: 'live', unavailable: 'Runs as a local cluster - no hosted demo' },
+    "problem": "Sharing an adapter creates two separate questions: did these bytes change, and were they included in the recorded history? Hash checks answer integrity; independently checked checkpoints answer inclusion. Neither establishes model quality or honest training.",
+    "stack": [
+      "Python",
+      "FastAPI",
+      "SHA-256",
+      "Merkle proofs",
+      "IPFS",
+      "EVM"
     ],
-    context: null,
+    "links": [
+      {
+        "kind": "source",
+        "href": "https://github.com/Kartik-MRK/Aethel"
+      },
+      {
+        "kind": "evidence",
+        "href": "https://github.com/Kartik-MRK/Aethel/tree/main/docs/evidence"
+      }
+    ],
+    "context": "Four-person capstone team. My contribution covers most Hub functionality and nearly all provenance functionality; integrations were shared. Teammates handled CLI, version control and ML work.",
+    "caveat": "Designed for a single-team adapter workflow. Content integrity and recorded inclusion are not guarantees about model behaviour. Checkpoint trust depends on the verifier’s chain and contract configuration."
   },
 
   {
-    id: '2',
-    slug: 'decentra-cert',
-    title: 'Decentra Cert',
-    domain: 'Blockchain',
-    diagram: 'merkle',
-    summary:
-      'A decentralized certification platform using soulbound NFTs, for academic credentials that can be verified without asking the institution.',
+    "id": "1",
+    "slug": "mini-raft-board",
+    "title": "MiniRAFT",
+    "domain": "Systems",
+    "diagram": "consensus",
+    "shortContext": "Distributed-systems project · in-memory cluster",
+    "summary": "A collaborative board backed by a three-node Raft cluster: majority commits, leader replacement, and follower recovery.",
+    "brief": [
+      "Drawing operations pass through a WebSocket gateway to a leader and two followers. A current-term majority must accept an operation before it appears as committed.",
+      "Per-follower progress, paginated catch-up and operation-ID deduplication help reconnecting nodes and clients recover without replaying a write twice."
+    ],
+    "work": [
+      "Leader election and current-term majority commits",
+      "Committed-prefix protection and follower catch-up",
+      "Operation-ID deduplication across retries",
+      "Docker Compose deployment with a gateway and three replicas"
+    ],
+    "problem": "A responsive board needs an agreed order of operations even when one replica disappears. Requiring a majority preserves a consistent committed history; losing quorum stops new commits.",
+    "stack": [
+      "Node.js",
+      "WebSocket",
+      "Raft",
+      "Docker"
+    ],
+    "links": [
+      {
+        "kind": "source",
+        "href": "https://github.com/hs-sathwikhs/CC_MiniRAFT"
+      },
+      {
+        "kind": "live",
+        "unavailable": "Local cluster · no hosted demo"
+      }
+    ],
+    "context": "Distributed-systems learning project.",
+    "caveat": "Terms, votes and logs live in memory. A restarted node can recover from surviving peers; a full cluster shutdown loses its history. There is no durable log, membership reconfiguration or authenticated service identity."
+  },
+
+  {
+    "id": "2",
+    "slug": "decentra-cert",
+    "title": "DecentraCert",
+    "domain": "Blockchain",
+    "diagram": "merkle",
+    "shortContext": "Research internship · PESU C-ISFCR",
+    "summary": "Wallet-bound event certificates with Merkle eligibility, one claim per eligible wallet, and public on-chain verification.",
+    "brief": [
+      "The contract fixes an eligibility root and metadata URI at deployment. An eligible wallet supplies its Merkle proof to claim its certificate once; transfers and approvals are blocked.",
+      "The public verifier checks the token owner and metadata consistency. Organizer uploads keep pinning credentials on the server and require an upload key."
+    ],
+    "work": [
+      "Fixed Merkle eligibility and metadata at deployment",
+      "One claim per eligible wallet",
+      "Transfer and approval rejection for issued certificates",
+      "Public ownership and metadata verification"
+    ],
+    "problem": "A participation certificate should remain attached to its eligible wallet and be independently checkable. Merkle proofs compact the eligibility list, while each successful claim still requires its own mint transaction.",
+    "stack": [
+      "Solidity",
+      "Node.js",
+      "React",
+      "Ethers.js",
+      "IPFS"
+    ],
+    "links": [
+      {
+        "kind": "source",
+        "href": "https://github.com/decentracert/decentracert"
+      },
+      {
+        "kind": "live",
+        "href": "https://decentracert.onrender.com/"
+      }
+    ],
+    "context": "Research internship at PESU C-ISFCR, June–July 2025.",
+    "caveat": "This test-network project verifies records and wallet ownership, not an issuer’s real-world identity. It has no independent contract audit, revocation or wallet recovery."
+  },
+
+  {
+    id: '13', slug: 'sanket', title: 'Sanket', domain: 'Web', diagram: 'offline',
+    shortContext: 'NABARD hackathon project',
+    summary: 'An offline-capable cash-flow app for rural enterprises, with acknowledged sync and an officer review workspace.',
     brief: [
-      'Certificates are issued as soulbound tokens, so a credential stays bound to the person who earned it and cannot be sold or transferred on. A cohort is batched into a Merkle tree, which puts one root on chain to cover many certificates instead of one transaction each.',
-      'Verification starts from a QR code on the certificate. It resolves to the on-chain record rather than to a file, which changes the question an employer has to answer from “does this document look right” to “does this record exist”.',
+      'Built for a NABARD hackathon, Sanket connects an enterprise transaction view with an officer workspace for forecasts, bilingual reasons, visits and cash-flow reports.',
+      'Entries are queued locally with stable UUIDs. A batch is marked synced only after the API acknowledges every entry; duplicate retries do not create duplicate transactions, and conflicting reuse of an ID is rejected.',
     ],
     work: [
-      'Soulbound issuance - the token cannot be transferred away from its holder',
-      'Merkle batching, so one on-chain root covers a whole cohort',
-      'QR validation that resolves to the record, not to a stored file',
-      'Issuer authentication, so only a recognised institution can mint',
+      'Dexie outbox with stable transaction IDs, pending states and retry handling',
+      'Atomic batch sync with UUID deduplication and conflict detection',
+      'District, sector and risk filters in the officer workspace',
+      'Bilingual explanations and printable SAAKH cash-flow reports',
     ],
-    problem:
-      'A PDF certificate proves very little: it can be edited, and the only real check available to a verifier is contacting the issuer. Putting the proof on chain answers that, but a credential is also not a tradeable asset - so it cannot be an ordinary NFT. Soulbound tokens plus one Merkle root per cohort keeps the credential attached to its holder and keeps the cost of issuing a cohort flat rather than per-certificate.',
-    stack: ['Solidity', 'Node.js', 'React', 'Ethers.js'],
+    problem: 'Intermittent connectivity should not lose a financial entry or count a retry twice. Sanket separates local capture from acknowledged server persistence, then keeps officer visits and actions across forecast recalculation.',
+    stack: ['React', 'TypeScript', 'FastAPI', 'SQLite', 'Dexie', 'PWA'],
     links: [
-      { kind: 'source', unavailable: 'Source not public' },
-      { kind: 'live', unavailable: 'Not yet deployed' },
+      { kind: 'source', href: 'https://github.com/Rakesh-R-K/Sanket' },
+      { kind: 'live', unavailable: 'Local hackathon demo' },
     ],
-    context: 'Built as a research intern at PESU C-ISFCR.',
+    context: 'NABARD hackathon project.',
+    caveat: 'An unauthenticated local demo with generated financial and rainfall records. Forecast ranges have no measured coverage; SAAKH is a cash-flow record, not a credit score or a validated lending decision.',
   },
 
   {
@@ -200,28 +261,37 @@ export const projects = [
   },
 
   {
-    id: '7',
-    slug: 'bank-networks',
-    title: 'Bank Networks',
-    domain: 'Security',
-    diagram: 'branch',
-    summary:
-      'A bank network built in Cisco Packet Tracer, with inter-branch communication carried through an ASA firewall and authentication at the edge.',
-    brief: [
-      'Branches sit on separate subnets and reach each other only through a central ASA firewall, so traffic between them is inspected rather than switched directly. Authentication is enforced at the boundary instead of trusting anything inside a branch by default.',
-      'The value of building it in Packet Tracer is that the topology is testable: a rule can be changed and the effect on reachability observed immediately, without hardware.',
+    "id": "7",
+    "slug": "bank-networks",
+    "title": "Bank Networks",
+    "domain": "Security",
+    "diagram": "branch",
+    "summary": "Packet Tracer coursework exploring bank branches, VLAN segmentation, static routing and ASA firewalls around ATM networks.",
+    "brief": [
+      "The documented topology connects three branches through a central router, with branch and ATM networks separated through VLANs and local firewall arrangements.",
+      "The design brief records routing, ACL and connectivity issues, including the limits of the initial centralized firewall approach."
     ],
-    work: [
-      'Branch subnets that cannot reach each other except through the firewall',
-      'ASA policy as the single place inter-branch traffic is decided',
-      'Authentication enforced at the boundary, not assumed inside a branch',
-      'Routing and addressing planned so branches can be added without renumbering',
+    "work": [
+      "Three-branch addressing and routing design",
+      "VLAN segmentation in Cisco Packet Tracer",
+      "ASA 5505 arrangements at ATM networks",
+      "Documented ACL, routing and firewall connectivity trade-offs"
     ],
-    problem:
-      'A flat bank network means a compromise at one branch reaches the others. Forcing every inter-branch path through a firewall makes that traffic something you can write policy about, at the cost of a chokepoint the addressing plan has to be designed around.',
-    stack: ['Computer Networks', 'Cisco Packet Tracer', 'ASA Firewall', 'Segmentation'],
-    links: [{ kind: 'source', unavailable: 'Packet Tracer topology - not public' }],
-    context: null,
+    "problem": "Branch connectivity and segmentation must work together. An initial central firewall design introduced connectivity problems, leading the design toward branch-level arrangements.",
+    "stack": [
+      "Cisco Packet Tracer",
+      "VLANs",
+      "Static routing",
+      "Cisco ASA"
+    ],
+    "links": [
+      {
+        "kind": "source",
+        "unavailable": "Coursework topology · source private"
+      }
+    ],
+    "context": "Computer Networks coursework, 2025.",
+    "caveat": "A simulated coursework design, not a deployed banking network. The topology and SSL VPN behaviour have not been independently revalidated."
   },
 
   {
@@ -315,19 +385,19 @@ export const projects = [
     domain: 'Web',
     diagram: 'route',
     summary:
-      'This site. A record of work rather than a brochure - two full palettes, hand-drawn system diagrams, and no stock photography.',
+      'A cybersecurity portfolio with professional and personal presentations, PAPER/TRACE themes, and interactive visual studies.',
     brief: [
       'Built on Vite and React with styled-components for the theme layer. The entire palette flips between a light paper world and a dark trace world from one control in the nav; both are full token sets, not a filter over the other.',
-      'Each project carries a diagram drawn by hand in SVG and animated by stroke offset as it enters the viewport, so the illustration is the explanation rather than decoration. Fonts are self-hosted variable files, so first paint costs no third-party request.',
+      'Each project carries an SVG system diagram with a brief drawing transition as it enters the viewport, so the illustration is the explanation rather than decoration. Fonts are self-hosted variable files, so first paint costs no third-party request.',
     ],
     work: [
       'Two complete themes, contrast-checked pair by pair against WCAG',
-      'Hand-authored SVG diagrams, one per project, that draw themselves on scroll',
+      'Project system diagrams with reduced-motion alternatives',
       'Self-hosted variable fonts - no CDN request on first paint',
       'One shared data layer, so no route can serve a project that does not exist',
     ],
     problem:
-      'The previous version of this site had the failure modes of a template: a purple gradient identity, percentage skill bars that contradicted their own captions, stock photography standing in for the work, and a detail page serving three placeholder projects that were never real. The rebuild keeps every true fact and drops everything that was filler.',
+      'The portfolio needs to make security work easy to assess while leaving room for the person behind it. Two presentations share the same project records, while their composition and visual emphasis change.',
     stack: ['React', 'Vite', 'styled-components', 'Framer Motion', 'JavaScript'],
     links: [
       { kind: 'source', href: 'https://github.com/hs-sathwikhs/Portfolio' },
@@ -343,16 +413,7 @@ export const projects = [
  */
 export const domains = ['All', 'Security', 'Systems', 'AI', 'Web', 'Blockchain'];
 
-/**
- * The home ledger shows the head of the ranking, not all of it. Eleven rows,
- * each carrying its own drawing, stops being a ledger you can compare line by
- * line and becomes a scroll - and it would put eleven SVG animations on the
- * first page. The cut is the ranking's top six, which is the whole reason the
- * order above is a ranking rather than a list; the full set with domain filters
- * is at /projects, and the tail of the home section states both numbers so the
- * reader knows something was held back.
- */
-export const featured = projects.slice(0, 6);
+export const featured = projects.filter((project) => ['12', '1', '2', '13'].includes(project.id));
 
 /** Accepts an id or a slug, so older /project/2 links keep resolving. */
 export function findProject(key) {

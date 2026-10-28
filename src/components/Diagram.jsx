@@ -6,8 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 /**
  * The signature element.
  *
- * Every project carries a drawing of the system it actually is, authored by
- * hand rather than photographed. Each one draws itself once as it enters the
+ * Every project carries a drawing of its system. Each one draws itself once as it enters the
  * viewport - the stroke arriving in the order you would draw it on paper - and
  * then holds still. Colour comes from the theme's diagram tokens, so both the
  * paper and trace worlds get a legible version of the same drawing.
@@ -306,47 +305,19 @@ function Bridge() {
   );
 }
 
-/** Bank Networks - every inter-branch path forced through the ASA. */
+/** Bank Networks - central routing with branch and ATM segmentation. */
 function Branch() {
-  return (
-    <>
-      <L i={0} x1={128} y1={63} x2={196} y2={126} {...wire} />
-      <L i={1} x1={128} y1={237} x2={196} y2={174} {...wire} />
-      <L i={2} x1={352} y1={150} x2={284} y2={150} {...wire} />
-
-      {/* the path that is not allowed to exist */}
-      <L i={3} x1={76} y1={82} x2={76} y2={218} {...faint} strokeDasharray="4 4" />
-      <P i={4} d="M69 143 L83 157 M83 143 L69 157" {...faint} strokeLinecap="round" />
-
-      <R
-        i={5}
-        x={196}
-        y={112}
-        width={88}
-        height={76}
-        rx="2"
-        fill="var(--dg-fill)"
-        stroke="var(--dg-stroke)"
-        strokeWidth="1.6"
-      />
-      <L i={6} x1={210} y1={124} x2={210} y2={176} {...faint} />
-      <L i={7} x1={270} y1={124} x2={270} y2={176} {...faint} />
-
-      <Box i={8} x={24} y={44} w={104} h={38} label="branch a" />
-      <Box i={9} x={24} y={218} w={104} h={38} label="branch b" />
-      <Box i={10} x={352} y={131} w={104} h={38} label="branch c" />
-
-      <T i={11} x={240} y={150} textAnchor="middle">
-        ASA
-      </T>
-      <T i={12} x={92} y={150} className="dim">
-        denied
-      </T>
-      <T i={13} x={240} y={284} textAnchor="middle" className="dim">
-        inter-branch traffic is inspected, never switched
-      </T>
-    </>
-  );
+  return <>
+    <Box i={0} x={177} y={28} w={126} h={36} label="central router" />
+    {[80,240,400].map((x,i) => <g key={x}>
+      <P i={i+1} d={`M240 64L${x} 113`} {...wire} />
+      <Box i={i+4} x={x-58} y={114} w={116} h={32} label={`branch ${i+1}`} />
+      <L i={i+7} x1={x} y1={146} x2={x} y2={184} {...hot} />
+      <Box i={i+10} x={x-48} y={185} w={96} h={32} label="ASA / ATM" />
+      <T i={i+13} x={x} y={244} textAnchor="middle" className="dim">local VLANs</T>
+    </g>)}
+    <T i={16} x={240} y={282} textAnchor="middle" className="dim">documented Packet Tracer design · static routing</T>
+  </>;
 }
 
 /** Portfolio - one data source, three routes that cannot disagree. */
@@ -425,44 +396,40 @@ function Chain() {
 
 /**
  * Mini-RAFT Board - a write is only committed once a majority has it. Two
- * followers acknowledge, the third is behind and catching up, which is the
- * whole point: the cluster does not wait for it.
+ * nodes acknowledge including the leader; the second follower catches up.
  */
 function Consensus() {
-  return (
-    <>
-      {/* client stroke into the leader */}
-      <L i={0} x1={86} y1={54} x2={182} y2={54} {...wire} />
-      <Head i={1} x={186} y={54} dir="right" />
-      <Box i={2} x={10} y={38} w={76} h={32} label="client" sub="stroke" />
+  return <>
+    <Box i={0} x={28} y={32} w={90} h={34} label="client" />
+    <L i={1} x1={118} y1={49} x2={193} y2={49} {...wire} />
+    <Head i={2} x={197} y={49} />
+    <Box i={3} x={200} y={28} w={102} h={42} label="leader" sub="ack" live />
+    <P i={4} d="M224 70L132 130" {...hot} />
+    <P i={5} d="M274 70L369 130" {...faint} strokeDasharray="4 4" />
+    <Box i={6} x={73} y={130} w={112} h={38} label="follower 1" sub="ack" live />
+    <Box i={7} x={314} y={130} w={112} h={38} label="follower 2" sub="catching up" dim />
+    <P i={8} d="M73 182V198H270V90" {...hot} />
+    <T i={9} x={168} y={224} textAnchor="middle" className="live">leader + one follower = 2/3</T>
+    <T i={10} x={240} y={277} textAnchor="middle" className="dim">majority commit · three nodes · in-memory state</T>
+  </>;
+}
 
-      <Box i={3} x={190} y={34} w={100} h={40} label="leader" live />
-
-      {/* replication fan-out: two acknowledge, one lags */}
-      <P i={4} d="M214 74 L84 124" {...hot} />
-      <L i={5} x1={240} y1={74} x2={240} y2={124} {...hot} />
-      <P i={6} d="M266 74 L396 124" {...faint} strokeDasharray="4 4" />
-
-      <Box i={7} x={18} y={124} w={100} h={38} label="replica 1" sub="ack" />
-      <Box i={8} x={190} y={124} w={100} h={38} label="replica 2" sub="ack" />
-      <Box i={9} x={362} y={124} w={100} h={38} label="replica 3" sub="behind" dim />
-
-      {/* the majority line: 2 of 3 is enough, drawn as the quorum bracket */}
-      <P i={10} d="M18 176 L18 188 L290 188 L290 176" {...hot} />
-      <T i={11} x={154} y={206} textAnchor="middle" className="live">
-        2 of 3 · quorum
-      </T>
-
-      {/* the lagging replica resyncs from where the logs diverged */}
-      <L i={12} x1={412} y1={162} x2={412} y2={192} {...faint} />
-      <Head i={13} x={412} y={196} dir="down" />
-      <Box i={14} x={353} y={196} w={118} h={28} label="sync-log" dim />
-
-      <T i={15} x={240} y={268} textAnchor="middle" className="dim">
-        the commit does not wait for the slowest node
-      </T>
-    </>
-  );
+function Provenance() {
+  return <>
+    <Box i={0} x={24} y={37} w={110} h={40} label="adapter" sub="content hash" />
+    <L i={1} x1={134} y1={57} x2={192} y2={57} {...hot} />
+    <Head i={2} x={196} y={57} live />
+    <Box i={3} x={200} y={33} w={108} h={48} label="Hub" sub="validate / publish" live />
+    <L i={4} x1={308} y1={57} x2={366} y2={57} {...wire} />
+    <Head i={5} x={370} y={57} />
+    <Box i={6} x={374} y={37} w={82} h={40} label="IPFS" sub="mirror" />
+    <P i={7} d="M254 81V139" {...hot} /><Head i={8} x={254} y={143} dir="down" live />
+    <Box i={9} x={179} y={148} w={151} h={36} label="append-only Merkle log" />
+    <P i={10} d="M225 184L113 232M280 184L391 232" {...wire} />
+    <Box i={11} x={35} y={232} w={157} h={32} label="exported inclusion proof" />
+    <Box i={12} x={310} y={232} w={151} h={32} label="EVM checkpoint" />
+    <T i={13} x={240} y={292} textAnchor="middle" className="dim">integrity of bytes · inclusion in history</T>
+  </>;
 }
 
 /**
@@ -885,8 +852,26 @@ function Assistant() {
   );
 }
 
+function Offline() {
+  return <>
+    <Box i={0} x={25} y={60} w={116} h={42} label="local entry" sub="stable UUID" />
+    <L i={1} x1={141} y1={81} x2={198} y2={81} {...hot} />
+    <Head i={2} x={202} y={81} live />
+    <Box i={3} x={206} y={60} w={105} h={42} label="Dexie outbox" />
+    <P i={4} d="M259 102V156H371V183" {...hot} />
+    <Head i={5} x={371} y={186} dir="down" live />
+    <Box i={6} x={314} y={190} w={120} h={40} label="FastAPI / SQLite" sub="commit or conflict" />
+    <P i={7} d="M314 210H104V106" {...wire} />
+    <Head i={8} x={104} y={104} dir="up" />
+    <T i={9} x={204} y={193} textAnchor="middle" className="dim">acknowledged IDs</T>
+    <T i={10} x={240} y={278} textAnchor="middle" className="dim">queued locally · retried safely · marked synced after ACK</T>
+  </>;
+}
+
 const DRAWINGS = {
-  consensus: { node: Consensus, alt: 'A RAFT cluster: a client stroke reaching the leader, which replicates to three followers. Two acknowledge and form a quorum of two of three; the third is behind and catches up through a log-sync endpoint.' },
+  offline: { node: Offline, alt: 'A local entry receives a stable UUID and enters the Dexie outbox. The FastAPI and SQLite batch endpoint commits or rejects conflicts, and acknowledged IDs return to the client before it marks entries synced.' },
+  provenance: { node: Provenance, alt: 'An adapter enters Hub validation and publication, with an IPFS mirror. The append-only Merkle log yields an exported inclusion proof checked against an EVM checkpoint.' },
+  consensus: { node: Consensus, alt: 'A three-node Raft cluster: the leader and one follower acknowledge to form a majority of two out of three. The second follower catches up. State is in memory.' },
   merkle: { node: Merkle, alt: 'A Merkle tree: four certificates hashed into two branches and one root, with the proof path from one certificate to the root highlighted.' },
   sequence: { node: Sequence, alt: 'Three channels of robot gait telemetry with one time window highlighted, feeding a 1D convolution, pooling and fully-connected stack that selects one terrain class. Test accuracy 0.8950.' },
   roles: { node: Roles, alt: 'Four roles - organiser, donor, hospital and inventory manager - passing through a role-based access layer to a severity-ranked request queue, which is served by one of two interchangeable allocation policies.' },
@@ -896,7 +881,7 @@ const DRAWINGS = {
   assistant: { node: Assistant, alt: 'A multilingual health question entering an assistant that either answers prevention guidance or refers to a clinician, with the same queries feeding a regional analytics dashboard.' },
   chain: { node: Chain, alt: 'A capture-the-flag chain: recon from outside the target boundary, then foothold, privilege escalation and root inside it, with the finding routed back out as a writeup.' },
   bridge: { node: Bridge, alt: 'Three edge devices speaking CoAP over UDP into a bridge, which republishes to an MQTT broker over TCP and out to subscribers.' },
-  branch: { node: Branch, alt: 'Three bank branches connected only through a central ASA firewall, with the direct branch-to-branch path marked denied.' },
+  branch: { node: Branch, alt: 'Documented Packet Tracer design: a central router links three branches with local VLANs and ASA firewalls around their ATM networks.' },
   route: { node: Route, alt: 'A single projects data file feeding three routes: the home page, the projects index, and the project detail page.' },
 };
 

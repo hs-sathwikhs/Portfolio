@@ -1,18 +1,3 @@
-/**
- * Practice - CTFs and lab work.
- *
- * Every number in this file comes from the résumé at /resume.pdf and nowhere
- * else: runner-up at the IIT Hyderabad CTF in January 2026, and 10+ national
- * and international events since November 2025. The categories below are the
- * ones the résumé names, in that order - crypto, steganography, blockchain,
- * OSINT, web exploitation - plus the systems side the lab work sits in.
- *
- * What is deliberately absent: platform ranks, solve counts and streaks. Those
- * are only worth printing next to a profile link that proves them, and there
- * isn't one to link yet. `writeups` stays null for the same reason - the
- * section renders that link only once there is a published index behind it.
- */
-
 export const practice = {
   team: {
     name: 'F_S0CI3TY',
@@ -22,12 +7,11 @@ export const practice = {
 
   /** Stated as results, because each one is checkable against an event. */
   standing: [
-    { label: 'IIT Hyderabad CTF', value: 'Runner-up', when: 'Jan 2026' },
-    { label: 'Events played', value: '10+', when: 'National & international' },
+    { label: 'Enigma CTF · IIT Hyderabad', value: 'Runner-up', when: 'Jan 2026' },
+    { label: 'Events played', value: '15+', when: 'National & international' },
   ],
 
-  note:
-    'Ongoing rather than finished: events run through the year and lab machines are worked between them. There are no solve counts or platform badges on this page, because none of them can be verified from outside — only results that belong to a named event.',
+  note: 'CTFs, lab machines and the security questions that carry over into project work.',
 
   writeups: null,
 };

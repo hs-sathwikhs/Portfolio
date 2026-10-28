@@ -1,15 +1,11 @@
-/**
- * Dates are written exactly as they can be substantiated, from the résumé at
- * /resume.pdf. An entry that has not finished reads "present", never a
- * projected end - except education, where the programme's scheduled end is a
- * fact about the programme rather than a prediction.
- *
- * Corrected 2026-08-20: the ISFCR internship previously read "Jun 2025 -
- * present" here. The résumé states June 2025 - July 2025. An internship that
- * has ended must not be presented as current.
- */
-
 export const record = [
+  {
+    kind: 'work', role: 'Technical Intern', org: 'Noventiq India',
+    href: 'https://noventiq.com/', place: 'Bengaluru, India',
+    from: 'Oct 2026', to: 'present', current: true,
+    detail: 'Guided study of enterprise firewall architecture and policies across Palo Alto, Check Point and Fortinet, alongside Azure security fundamentals on the Microsoft certification path.',
+    tags: ['Network security', 'Firewalls', 'Azure'],
+  },
   {
     kind: 'work',
     role: 'Research Intern',
@@ -20,7 +16,7 @@ export const record = [
     to: 'Jul 2025',
     current: false,
     detail:
-      'Research intern at the university’s information-security and cyber-resilience centre, on the certification platform: Solidity contracts issuing soulbound credentials, batch issuance over Merkle proofs, and the dApp and web interfaces that issue and verify them.',
+      'Research intern at the university’s information-security and cyber-resilience centre, on the certification platform: Solidity contracts issuing soulbound credentials, Merkle eligibility proofs, and the dApp and web interfaces that issue and verify them.',
     tags: ['Solidity', 'Smart contracts', 'React', 'Node.js'],
   },
 ];
@@ -39,13 +35,13 @@ export const activities = [
     kind: 'activity',
     role: 'Co-founder',
     org: 'F_S0CI3TY',
-    href: null,
+    href: 'https://fs0ci3ty.vercel.app/',
     place: 'Bengaluru, India',
     from: 'Nov 2025',
     to: 'present',
     current: true,
     detail:
-      'Co-founded a competitive capture-the-flag team and play with it: 10+ national and international events, across web exploitation, cryptography, steganography and forensics, OSINT and blockchain. The results, and what the practice actually consists of, are in Practice above.',
+      'Co-founded a competitive capture-the-flag team and play with it: 15+ national and international events, across web exploitation, cryptography, steganography and forensics, OSINT and blockchain. ',
     tags: ['CTF', 'Web exploitation', 'Cryptography', 'OSINT', 'Blockchain'],
   },
 ];
@@ -58,7 +54,7 @@ export const education = [
     href: 'https://pes.edu/',
     place: 'Bengaluru, India',
     from: '2023',
-    to: '2027',
+    to: 'present',
     current: true,
     detail:
       'Programming fundamentals, data structures and algorithms, operating systems, computer networks and software engineering, alongside project work across systems, security and applied machine learning.',
@@ -68,7 +64,7 @@ export const education = [
     kind: 'education',
     role: 'Pre-University Course',
     org: 'TLC PU College (a unit of CFAL)',
-    href: 'https://tlc.edu.in/pu-college/',
+    href: 'https://tlc.edu.in/',
     place: 'Mangaluru, India',
     from: '2021',
     to: '2023',
