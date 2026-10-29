@@ -18,6 +18,7 @@ export const Band = styled.section`
   position: relative;
   padding-block: ${(p) => p.theme.space.section};
   background: ${(p) => (p.$recessed ? p.theme.paper2 : p.theme.paper)};
+  h2 { font-weight: ${(p) => p.theme.personal ? 450 : p.theme.displayWeight}; }
   border-top: 1px solid ${(p) => p.theme.rule};
 `;
 
@@ -107,7 +108,8 @@ const actionBase = css`
   align-items: center;
   gap: 0.6rem;
   padding: 0.72rem 1.2rem;
-  border-radius: ${(p) => p.theme.radius.sm};
+  border-radius: ${(p) => p.theme.personal ? '999px' : p.theme.radius.sm};
+  min-height: ${(p) => p.theme.personal ? '54px' : '48px'};
   font-size: ${(p) => p.theme.type.small};
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -119,8 +121,14 @@ const actionBase = css`
     color var(--dur-hover) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 
-  &:active {
-    transform: translateY(1px);
+  > span[aria-hidden] { transition: transform 260ms var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    &:hover { transform: translateY(-3px); }
+    &:hover > span[aria-hidden] { transform: translate(3px, -3px); }
+  }
+  &:active { transform: translateY(1px) scale(0.97); }
+  @media (prefers-reduced-motion: reduce) {
+    &:hover, &:active, &:hover > span[aria-hidden] { transform: none; }
   }
 
   svg {

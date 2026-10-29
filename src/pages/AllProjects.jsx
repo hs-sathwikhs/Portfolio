@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Shell, Meta, SectionRule, TagRow, Tag } from '../components/ui/Primitives';
@@ -50,6 +50,7 @@ const Filter = styled.button`
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 0.5rem 0.85rem;
+  min-height: 44px;
   border-radius: ${(p) => p.theme.radius.sm};
   border: 1px solid ${(p) => (p.$on ? p.theme.seal : p.theme.ruleStrong)};
   background: ${(p) => (p.$on ? p.theme.seal : 'transparent')};
@@ -92,10 +93,11 @@ const Entry = styled(Link)`
   gap: clamp(1.25rem, 3vw, 2.5rem);
   align-items: start;
   padding-block: clamp(1.5rem, 3.5vh, 2.25rem);
+  [data-presentation="personal"] & { grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 1fr); }
+  @media (max-width: 860px) { [data-presentation="personal"] & { grid-template-columns: 2.5rem minmax(0, 1fr); } }
   text-decoration: none;
   transition:
-    background-color var(--dur-hover) var(--ease-out),
-    padding-inline var(--dur-hover) var(--ease-out);
+    background-color var(--dur-hover) var(--ease-out);
 
   @media (max-width: 860px) {
     grid-template-columns: 2.5rem minmax(0, 1fr);
@@ -105,7 +107,7 @@ const Entry = styled(Link)`
   @media (hover: hover) and (pointer: fine) {
     &:hover {
       background: ${(p) => p.theme.paperInk};
-      padding-inline: 1rem;
+
     }
 
     &:hover h2 {
@@ -147,6 +149,19 @@ const Plate = styled.div`
 
 export default function AllProjects() {
   const [domain, setDomain] = useState('All');
+  const rows = useRef(null);
+  const previousDomain = useRef(domain);
+  useLayoutEffect(() => {
+    if (previousDomain.current === domain) return;
+    previousDomain.current = domain;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animation = rows.current.animate(
+      reduce ? [{ opacity: .4 }, { opacity: 1 }]
+        : [{ opacity: .25, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: reduce ? 120 : 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+    );
+    return () => animation.cancel();
+  }, [domain]);
 
   const shown = useMemo(
     () => (domain === 'All' ? projects : projects.filter((p) => p.domain === domain)),
@@ -156,11 +171,10 @@ export default function AllProjects() {
   return (
     <Shell>
       <Head>
-        <h1>Everything built so far, with the reasoning attached.</h1>
+        <h1>The project index.</h1>
         <p>
           {projects.length} projects across security, systems, applied ML, web and on-chain work.
-          The home page shows the first {featured.length}; the rest are here. Each one has a record
-          of its own explaining the problem it had to solve and what that cost.
+          Start with the {featured.length} selected case studies, or explore the wider collection below.
         </p>
         <Rule>
           <SectionRule index="IDX" name="Project index" />
@@ -185,7 +199,7 @@ export default function AllProjects() {
         </Count>
       </Head>
 
-      <Rows>
+      <Rows ref={rows}>
         {shown.map((project, i) => (
           <Row key={project.id}>
             <Reveal delay={Math.min(i, 3) * 0.05}>

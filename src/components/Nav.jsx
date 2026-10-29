@@ -1,515 +1,139 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useMode } from '../theme/ThemeContext';
-import { profile } from '../data/profile';
 
-const SECTIONS = [
-  { id: 'work', label: 'Work' },
-  { id: 'practice', label: 'Practice' },
-  { id: 'record', label: 'Record' },
-  { id: 'stack', label: 'Stack' },
-  { id: 'contact', label: 'Contact' },
-];
-
-/* ----------------------------------------------------------------------- */
-
-const Bar = styled.header`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: ${(p) => p.theme.z.nav};
-  display: flex;
-  justify-content: center;
-  padding: 1.15rem ${(p) => p.theme.space.gutter};
-  pointer-events: none;
+const Header = styled.header`
+  view-transition-name: site-header;
+  position: fixed; inset: ${(p) => p.theme.personal ? '16px 0 auto' : '0 0 auto'}; z-index: 100;
+  background: ${(p) => p.theme.personal ? 'transparent' : p.theme.paper}; border-bottom: ${(p) => p.theme.personal ? '0' : `1px solid ${p.theme.rule}`};
 `;
-
-const Pill = styled.nav`
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  max-width: ${(p) => p.theme.maxw};
-  padding: 0.45rem 0.5rem 0.45rem 0.9rem;
-  border: 1px solid ${(p) => (p.$condensed ? p.theme.rule : 'transparent')};
-  border-radius: ${(p) => p.theme.radius.pill};
-  background: ${(p) => (p.$condensed ? p.theme.overlay : 'transparent')};
-  backdrop-filter: ${(p) => (p.$condensed ? 'blur(14px) saturate(1.4)' : 'none')};
-  box-shadow: ${(p) => (p.$condensed ? `0 1px 18px -8px ${p.theme.shadow}` : 'none')};
-  transition:
-    background-color var(--dur-menu) var(--ease-out),
-    border-color var(--dur-menu) var(--ease-out),
-    box-shadow var(--dur-menu) var(--ease-out);
+const Bar = styled.div`
+  max-width: 1400px; margin: auto; padding: ${(p) => p.theme.personal ? '0 1.35rem' : '0 clamp(1rem, 4vw, 3.5rem)'};
+  width: ${(p) => p.theme.personal ? 'calc(100% - 3rem)' : '100%'};
+  border: ${(p) => p.theme.personal ? `1px solid ${p.theme.rule}` : '0'};
+  border-radius: ${(p) => p.theme.personal ? '14px' : '0'};
+  background: ${(p) => p.theme.personal ? p.theme.paper2 : 'transparent'};
+  height: ${(p) => p.theme.personal ? '68px' : '76px'}; display: flex; gap: 2rem; align-items: center;
+  @media (max-width: 760px) { height: 64px; gap: .3rem; padding-inline: 12px; width: ${(p) => p.theme.personal ? 'calc(100% - 1.5rem)' : '100%'}; }
 `;
-
-const Mark = styled(Link)`
-  display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  margin-right: auto;
-  text-decoration: none;
-  color: ${(p) => p.theme.ink};
-
-  b {
-    font-family: ${(p) => p.theme.font.display};
-    font-weight: ${(p) => p.theme.displayWeightBold};
-    font-size: 1.0625rem;
-    letter-spacing: -0.01em;
-  }
-
-  span {
-    font-family: ${(p) => p.theme.font.mono};
-    font-size: ${(p) => p.theme.type.label};
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: ${(p) => p.theme.graphite};
-
-    @media (max-width: 560px) {
-      display: none;
-    }
-  }
+const Brand = styled(Link)`
+  text-decoration: none; font-weight: 650; letter-spacing: -0.04em; font-size: 1.2rem;
+  white-space: nowrap; margin-right: auto;
+  span { color: ${(p) => p.theme.seal}; }
+  @media (max-width: 360px) { font-size: 0; &::before { content: "s."; font-size: 1.2rem; } }
 `;
-
-const Links = styled.ul`
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
-
-  @media (max-width: 820px) {
-    display: none;
-  }
+const Links = styled.nav`
+  display: flex; gap: 1.5rem; align-items: center; font-size: 0.83rem;
+  a { position: relative; text-decoration: none; padding-block: 0.7rem; }
+  a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 5px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 280ms var(--ease-out); }
+  a:hover::after, a:focus-visible::after { transform: scaleX(1); }
+  a:hover, a[aria-current] { color: ${(p) => p.theme.seal}; }
+  @media (max-width: 960px) { display: none; }
 `;
-
-const NavLink = styled(Link)`
-  position: relative;
-  display: block;
-  padding: 0.45rem 0.72rem;
-  font-family: ${(p) => p.theme.font.mono};
-  font-size: ${(p) => p.theme.type.label};
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: ${(p) => (p.$active ? p.theme.ink : p.theme.graphite)};
-  transition: color var(--dur-hover) var(--ease-out);
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      color: ${(p) => p.theme.ink};
-    }
-  }
-
-  /* The marker is a filled square, not a growing underline - it reads as a
-     checked field on a form rather than a hover leftover. */
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0.28rem;
-    top: 50%;
-    width: 4px;
-    height: 4px;
-    margin-top: -2px;
-    background: ${(p) => p.theme.seal};
-    opacity: ${(p) => (p.$active ? 1 : 0)};
-    transform: scale(${(p) => (p.$active ? 1 : 0.4)});
-    transition:
-      opacity var(--dur-hover) var(--ease-out),
-      transform var(--dur-hover) var(--ease-out);
-  }
-
-  padding-left: 1.1rem;
+const Switch = styled.div`
+  position: relative; display: flex; padding: 3px; border: 1px solid ${(p) => p.theme.ruleStrong}; border-radius: ${(p) => p.theme.personal ? '8px' : '3px'};
+  &::before { content: ''; position: absolute; inset: 3px auto 3px 3px; width: calc(50% - 3px); border-radius: inherit; background: ${(p) => p.theme.ink}; transform: translateX(${(p) => p.$personal ? '100%' : '0'}); transition: transform 280ms var(--ease-out); }
+  button { position: relative; z-index: 1; width: 96px; font-size: .75rem; padding: .48rem .5rem; min-height: 36px; transition: color 220ms ease; }
+  button[aria-pressed='true'] { color: ${(p) => p.theme.paper}; }
+  @media (max-width: 760px) { button { width: 74px; padding-inline: .25rem; font-size: .68rem; } }
 `;
-
-/* Mode control ---------------------------------------------------------- */
-
-const Modes = styled.div`
-  display: flex;
-  align-items: stretch;
-  border: 1px solid ${(p) => p.theme.rule};
-  border-radius: ${(p) => p.theme.radius.pill};
-  overflow: hidden;
+const Appearance = styled.button`
+  display: flex; align-items: center; gap: 0.5rem; min-width: 44px; min-height: 44px;
+  font: 0.65rem ${(p) => p.theme.font.mono}; letter-spacing: 0.06em;
+  i { display: block; width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%;
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%); transform: rotate(${(p) => p.$dark ? '180deg' : '0deg'}); transition: transform 450ms var(--ease-out); }
+  @media (max-width: 760px) { justify-content: center; min-width: 36px; span { display: none; } }
 `;
-
-const ModeButton = styled.button`
-  padding: 0.4rem 0.72rem;
-  font-family: ${(p) => p.theme.font.mono};
-  font-size: ${(p) => p.theme.type.label};
-  letter-spacing: 0.14em;
-  color: ${(p) => (p.$on ? p.theme.sealInk : p.theme.graphite)};
-  background: ${(p) => (p.$on ? p.theme.seal : 'transparent')};
-  transition:
-    background-color var(--dur-hover) var(--ease-out),
-    color var(--dur-hover) var(--ease-out);
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      color: ${(p) => (p.$on ? p.theme.sealInk : p.theme.ink)};
-    }
-  }
-
-  /* Inset, because the pair sits inside a pill that clips its overflow. The ring
-     also has to change colour on the selected half: that half is filled with the
-     seal, and the global seal ring on a seal fill is an invisible focus state. */
-  &:focus-visible {
-    outline-offset: -3px;
-    outline-color: ${(p) => (p.$on ? p.theme.sealInk : p.theme.seal)};
-  }
+const MenuButton = styled.button`
+  min-height: 44px; min-width: 40px; font-size: 0.75rem;
+  @media (min-width: 961px) { display: none; }
 `;
-
-/* Hamburger ------------------------------------------------------------- */
-
-const Burger = styled.button`
-  position: relative;
-  display: none;
-  width: 38px;
-  height: 38px;
-  border: 1px solid ${(p) => p.theme.rule};
-  border-radius: ${(p) => p.theme.radius.pill};
-
-  @media (max-width: 820px) {
-    display: block;
-  }
-
-  span {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 15px;
-    height: 1.5px;
-    margin-left: -7.5px;
-    background: ${(p) => p.theme.ink};
-    transition: transform var(--dur-menu) var(--ease-out);
-  }
-
-  ${(p) =>
-    p.$open
-      ? css`
-          span:first-child {
-            transform: translateY(-0.75px) rotate(45deg);
-          }
-          span:last-child {
-            transform: translateY(-0.75px) rotate(-45deg);
-          }
-        `
-      : css`
-          span:first-child {
-            transform: translateY(-4.75px);
-          }
-          span:last-child {
-            transform: translateY(3.25px);
-          }
-        `};
+const Menu = styled.dialog`
+  inset: 0 0 0 auto; margin: 0; width: min(360px, 100%); max-width: 100%; max-height: 100%; height: 100dvh;
+  padding: 1.5rem; border: 0; border-left: 1px solid ${(p) => p.theme.ruleStrong};
+  background: ${(p) => p.theme.paper}; color: ${(p) => p.theme.ink};
+  &::backdrop { background: ${(p) => p.theme.shadowDeep}; }
+  > button { display: block; margin-left: auto; min-height: 44px; padding-inline: 1rem; }
+  h2 { margin-block: 2rem; font-size: 2.5rem; }
+  nav { display: grid; }
+  a { padding: 1rem 0; border-bottom: 1px solid ${(p) => p.theme.rule}; text-decoration: none; font-size: 1.2rem; }
 `;
-
-/* Overlay --------------------------------------------------------------- */
-
-const Sheet = styled(motion.div)`
-  position: fixed;
-  inset: 0;
-  z-index: ${(p) => p.theme.z.overlay};
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 6rem ${(p) => p.theme.space.gutter} 3rem;
-  background: ${(p) => p.theme.overlay};
-  backdrop-filter: blur(22px) saturate(1.3);
+const Skip = styled.a`
+  position: fixed; top: -100px; left: 1rem; z-index: 400; padding: 0.8rem;
+  background: ${(p) => p.theme.ink}; color: ${(p) => p.theme.paper};
+  &:focus { top: 0.5rem; }
 `;
-
-const SheetLinks = styled.ul`
-  display: grid;
-  gap: 0.25rem;
-`;
-
-const SheetItem = styled(motion.li)`
-  border-top: 1px solid ${(p) => p.theme.rule};
-
-  &:last-child {
-    border-bottom: 1px solid ${(p) => p.theme.rule};
-  }
-
-  a {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.15rem 0.25rem;
-    font-family: ${(p) => p.theme.font.display};
-    font-weight: ${(p) => p.theme.displayWeight};
-    font-size: clamp(2rem, 11vw, 3rem);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    text-decoration: none;
-    color: ${(p) => p.theme.ink};
-  }
-
-  em {
-    font-family: ${(p) => p.theme.font.mono};
-    font-style: normal;
-    font-size: ${(p) => p.theme.type.label};
-    letter-spacing: 0.16em;
-    color: ${(p) => p.theme.graphite};
-  }
-`;
-
-const SheetFoot = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-top: 2.5rem;
-
-  a {
-    font-family: ${(p) => p.theme.font.mono};
-    font-size: ${(p) => p.theme.type.micro};
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: ${(p) => p.theme.graphite};
-    text-decoration: none;
-  }
-`;
-
-export const SkipLink = styled.a`
-  position: fixed;
-  top: 0.75rem;
-  left: 50%;
-  z-index: ${(p) => p.theme.z.skip};
-  padding: 0.6rem 1rem;
-  font-family: ${(p) => p.theme.font.mono};
-  font-size: ${(p) => p.theme.type.micro};
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: ${(p) => p.theme.sealInk};
-  background: ${(p) => p.theme.seal};
-  border-radius: ${(p) => p.theme.radius.sm};
-  transform: translate(-50%, -160%);
-  transition: transform var(--dur-menu) var(--ease-out);
-
-  &:focus-visible {
-    transform: translate(-50%, 0);
-  }
-`;
-
-/* ----------------------------------------------------------------------- */
 
 export default function Nav() {
-  const { pathname, hash } = useLocation();
-  const { mode, setMode } = useMode();
-  const reduce = useReducedMotion();
+  const { mode, toggle, presentation, setPresentation } = useMode();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const choosePresentation = (next) => {
+    setPresentation(next);
+    if (next === "professional" && location.hash === "#personal") navigate({ pathname: location.pathname, search: location.search, hash: "" }, { replace: true });
+  };
+  const dialog = useRef(null);
+  const opener = useRef(null);
+  const restoreOverflow = useRef('');
+  const personal = presentation === 'personal';
+  const links = [
 
-  const [open, setOpen] = useState(false);
-  const [condensed, setCondensed] = useState(false);
-  const [active, setActive] = useState('');
-
-  const burgerRef = useRef(null);
-  const closeRef = useRef(null);
-  const onHome = pathname === '/';
-
-  // Condense on a sentinel leaving the viewport rather than a scroll listener,
-  // so no work happens on the scroll thread.
+    { label: personal ? 'Selected work' : 'Work', to: '/#work' }, { label: personal ? 'My story' : 'Experience', to: '/#record' }, { label: 'Contact', to: '/#contact' },
+  ];
+  const menuAnimation = useRef(null);
+  const close = () => {
+    const node = dialog.current;
+    if (!node?.open) return;
+    const from = getComputedStyle(node).transform;
+    menuAnimation.current?.cancel();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { node.close(); return; }
+    menuAnimation.current = node.animate([{ transform: from, opacity: 1 }, { transform: 'translateX(100%)', opacity: .5 }], { duration: 220, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
+    menuAnimation.current.finished.then(() => node.close()).catch(() => {});
+  };
+  useEffect(() => { close(); }, [location.key]);
   useEffect(() => {
-    const sentinel = document.getElementById('nav-sentinel');
-    if (!sentinel) {
-      setCondensed(!onHome);
-      return undefined;
-    }
-    const io = new IntersectionObserver(([entry]) => setCondensed(!entry.isIntersecting), {
-      threshold: 0,
-    });
-    io.observe(sentinel);
-    return () => io.disconnect();
-  }, [onHome, pathname]);
-
-  // Track which section owns the upper third of the viewport.
-  //
-  // The observer hands back only the entries that *changed*, so deciding from
-  // the batch alone leaves the marker stuck on a section you have already left
-  // whenever the leaving is the only thing reported. Visibility is kept in a
-  // map instead, and the topmost visible section wins.
-  useEffect(() => {
-    if (!onHome) {
-      setActive('');
-      return undefined;
-    }
-    const targets = SECTIONS.map(({ id }) => document.getElementById(id)).filter(Boolean);
-    if (!targets.length) return undefined;
-
-    const visible = new Map();
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) visible.set(entry.target.id, entry.boundingClientRect.top);
-          else visible.delete(entry.target.id);
-        });
-        const top = [...visible.entries()].sort((a, b) => a[1] - b[1])[0];
-        setActive(top ? top[0] : '');
-      },
-      { rootMargin: '-25% 0px -60% 0px', threshold: 0 },
-    );
-    targets.forEach((t) => io.observe(t));
-    return () => io.disconnect();
-  }, [onHome, pathname]);
-
-  // Close on route or hash change.
-  useEffect(() => setOpen(false), [pathname, hash]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const onKey = (event) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKey);
-    closeRef.current?.focus();
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  const close = useCallback(() => {
-    setOpen(false);
-    burgerRef.current?.focus();
+    const query = matchMedia('(min-width: 961px)');
+    const resized = (event) => { if (event.matches) close(); };
+    query.addEventListener('change', resized);
+    return () => { query.removeEventListener('change', resized); document.body.style.overflow = restoreOverflow.current; };
   }, []);
-
-  const target = (id) => (onHome ? `#${id}` : `/#${id}`);
-
-  const sheet = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] } },
-    out: { opacity: 0, transition: { duration: 0.16, ease: [0.23, 1, 0.32, 1] } },
+  const open = () => {
+    restoreOverflow.current = document.body.style.overflow;
+    dialog.current.showModal();
+    document.body.style.overflow = 'hidden';
+    menuAnimation.current?.cancel();
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) menuAnimation.current = dialog.current.animate([{ transform: 'translateX(100%)', opacity: .5 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
   };
-
-  const item = {
-    hidden: { opacity: 0, transform: reduce ? 'translateY(0px)' : 'translateY(18px)' },
-    show: (i) => ({
-      opacity: 1,
-      transform: 'translateY(0px)',
-      transition: { duration: 0.34, delay: 0.05 + i * 0.045, ease: [0.23, 1, 0.32, 1] },
-    }),
-  };
-
-  return (
-    <>
-      <SkipLink href="#main">Skip to content</SkipLink>
-
-      <Bar>
-        <Pill $condensed={condensed || open} aria-label="Primary">
-          <Mark to="/" aria-label={`${profile.name} - home`}>
-            <b>{profile.name}</b>
-            <span>{profile.disciplines.join(' · ')}</span>
-          </Mark>
-
-          <Links>
-            {SECTIONS.map(({ id, label }) => (
-              <li key={id}>
-                <NavLink
-                  to={target(id)}
-                  $active={active === id}
-                  aria-current={active === id ? 'true' : undefined}
-                >
-                  {label}
-                </NavLink>
-              </li>
-            ))}
-          </Links>
-
-          <Modes role="group" aria-label="Colour mode">
-            <ModeButton
-              type="button"
-              $on={mode === 'paper'}
-              aria-pressed={mode === 'paper'}
-              onClick={() => setMode('paper')}
-            >
-              Paper
-            </ModeButton>
-            <ModeButton
-              type="button"
-              $on={mode === 'trace'}
-              aria-pressed={mode === 'trace'}
-              onClick={() => setMode('trace')}
-            >
-              Trace
-            </ModeButton>
-          </Modes>
-
-          <Burger
-            ref={burgerRef}
-            type="button"
-            $open={open}
-            aria-expanded={open}
-            aria-controls="nav-sheet"
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            onClick={() => setOpen((v) => !v)}
-          >
-            <span />
-            <span />
-          </Burger>
-        </Pill>
-      </Bar>
-
-      <AnimatePresence>
-        {open && (
-          <Sheet
-            id="nav-sheet"
-            variants={sheet}
-            initial="hidden"
-            animate="show"
-            exit="out"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu"
-          >
-            <SheetLinks>
-              {SECTIONS.map(({ id, label }, n) => (
-                <SheetItem key={id} custom={n} variants={item} initial="hidden" animate="show">
-                  <Link
-                    to={target(id)}
-                    ref={n === 0 ? closeRef : undefined}
-                    onClick={() => setOpen(false)}
-                  >
-                    {label}
-                    <em>{String(n + 1).padStart(2, '0')}</em>
-                  </Link>
-                </SheetItem>
-              ))}
-              <SheetItem custom={SECTIONS.length} variants={item} initial="hidden" animate="show">
-                <Link to="/projects" onClick={() => setOpen(false)}>
-                  All projects
-                  <em>{String(SECTIONS.length + 1).padStart(2, '0')}</em>
-                </Link>
-              </SheetItem>
-            </SheetLinks>
-
-            <SheetFoot>
-              {profile.social.map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer">
-                  {s.label}
-                </a>
-              ))}
-              <button
-                type="button"
-                onClick={close}
-                style={{
-                  marginLeft: 'auto',
-                  fontFamily: 'inherit',
-                  fontSize: 'inherit',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Close
-              </button>
-            </SheetFoot>
-          </Sheet>
-        )}
-      </AnimatePresence>
-    </>
-  );
+  return <>
+    <Skip href="#main">Skip to content</Skip>
+    <Header><Bar>
+      <Brand to="/" aria-label="Sathwik HS, home">sathwik<span>.</span></Brand>
+      <Links aria-label="Main navigation">{links.map(({ label, to }) => <Link key={to} to={to}>{label}</Link>)}</Links>
+      <Switch $personal={personal} role="group" aria-label="Site presentation">
+        <button type="button" aria-pressed={!personal} onClick={() => choosePresentation('professional')}>Professional</button>
+        <button type="button" aria-pressed={personal} onClick={() => choosePresentation('personal')}>Personal</button>
+      </Switch>
+      <Appearance $dark={mode === "trace"} type="button" onClick={toggle} aria-label={`Switch to ${mode === 'paper' ? 'TRACE dark' : 'PAPER light'} theme`}>
+        <i aria-hidden="true" /><span>{mode.toUpperCase()}</span>
+      </Appearance>
+      <MenuButton type="button" ref={opener} onClick={open} aria-haspopup="dialog" aria-controls="navigation-menu">Menu</MenuButton>
+    </Bar></Header>
+    <Menu onCancel={(event) => { event.preventDefault(); close(); }} onKeyDown={(event) => {
+      if (event.key !== 'Tab') return;
+      const focusable = [...event.currentTarget.querySelectorAll('button, a[href]')];
+      const first = focusable[0]; const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }} ref={dialog} id="navigation-menu" aria-labelledby="navigation-title" onClick={(e) => { if (e.target === e.currentTarget && e.clientX < e.currentTarget.getBoundingClientRect().left) close(); }}
+      onClose={() => { document.body.style.overflow = restoreOverflow.current; opener.current?.focus({ preventScroll: true }); }}>
+      <button type="button" onClick={close} autoFocus>Close</button>
+      <h2 id="navigation-title">Find your way.</h2>
+      <nav aria-label="Mobile navigation">{links.map(({ label, to }) => <Link key={to} to={to} onClick={close}>{label}</Link>)}
+        <Link to="/#practice" onClick={close}>Security practice</Link>
+        <Link to="/projects" onClick={close}>All projects</Link>
+        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" onClick={close}>Résumé ↗</a>
+      </nav>
+    </Menu>
+  </>;
 }

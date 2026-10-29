@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Shell, Meta, Quiet } from './ui/Primitives';
 import { profile } from '../data/profile';
+import { useMode } from '../theme/ThemeContext';
+import SignatureMark from './art/Signature';
 
 /**
  * A colophon, not a link farm. Three columns of real information - where the
@@ -126,16 +128,17 @@ const SECTIONS = [
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { presentation } = useMode();
 
   return (
     <Foot>
       <Shell>
         <Grid>
           <Signature>
-            <b>{profile.name}</b>
+            <b>{profile.name}</b>{presentation === "personal" && <SignatureMark kind="wink" style={{ width: 28, height: 28, marginTop: 16 }} />}
             <address>
               <Meta>{profile.city}</Meta>
-              <Meta>{profile.coordinates}</Meta>
+
             </address>
           </Signature>
 

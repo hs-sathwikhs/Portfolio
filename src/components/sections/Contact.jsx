@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Shell, Band, Meta, Opener, SectionRule, ActionButton, Quiet } from '../ui/Primitives';
+import { Shell, Band, Meta, Opener, ActionButton, Quiet } from '../ui/Primitives';
 import Reveal from '../ui/Reveal';
 import { profile } from '../../data/profile';
+import { useMode } from '../../theme/ThemeContext';
+import Signature from '../art/Signature';
 
 /**
  * A form that actually sends.
@@ -104,7 +106,7 @@ const Field = styled.div`
     padding: 0.7rem 0.85rem;
     background: ${(p) => p.theme.paper};
     border: 1px solid ${(p) => (p.$invalid ? p.theme.seal : p.theme.ruleStrong)};
-    border-radius: ${(p) => p.theme.radius.sm};
+    border-radius: ${(p) => p.theme.personal ? "8px" : p.theme.radius.sm};
     font-size: ${(p) => p.theme.type.small};
     transition:
       border-color var(--dur-hover) var(--ease-out),
@@ -119,6 +121,7 @@ const Field = styled.div`
 
   input:focus,
   textarea:focus {
+    box-shadow: 0 0 0 4px ${(p) => p.theme.sealWash};
     background: ${(p) => p.theme.paperInk};
   }
 
@@ -191,6 +194,7 @@ function validate(values) {
 }
 
 export default function Contact() {
+  const { presentation } = useMode();
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [state, setState] = useState('idle'); // idle | sending | sent | handoff | failed
@@ -233,6 +237,7 @@ export default function Contact() {
     setErrors(found);
     if (Object.keys(found).length > 0) {
       setState('idle');
+      document.getElementById(Object.keys(found)[0])?.focus();
       return;
     }
 
@@ -266,15 +271,14 @@ export default function Contact() {
   };
 
   return (
-    <Band id="contact" $recessed>
+    <Band id="contact" data-reading-section $recessed>
       <Shell>
         <Reveal>
           <Opener>
-            <h2>If any of this is useful to you, write to me.</h2>
-            <SectionRule index="05" name="Contact" />
+            <h2>{presentation === 'personal' ? <>A good conversation<br />starts somewhere.</> : 'Let’s talk security.'}</h2>
+
             <p>
-              Internships, blockchain or network work, or a question about something above. The form
-              sends a real message; the address beside it works just as well.
+              I’m looking for a January–June 2027 internship in network/cloud security or AppSec/pentesting, and I’m open to full-time opportunities.
             </p>
           </Opener>
         </Reveal>
@@ -304,10 +308,6 @@ export default function Contact() {
                 <div>
                   <Meta as="dt">Located</Meta>
                   <dd>{profile.city}</dd>
-                </div>
-                <div>
-                  <Meta as="dt">Coordinates</Meta>
-                  <dd className="tabular">{profile.coordinates}</dd>
                 </div>
               </Direct>
 
@@ -409,7 +409,8 @@ export default function Contact() {
 
                 <Foot>
                   <ActionButton type="submit" disabled={state === 'sending'}>
-                    {state === 'sending' ? 'Sending…' : 'Send message'}
+                    {state === 'sending' ? 'Sending…' : configured ? 'Send message' : 'Create email draft'}
+                    {presentation === 'personal' && <Signature kind="arc" style={{ width: 20, height: 20 }} />}
                   </ActionButton>
 
                   <Status role="status" aria-live="polite" $bad={state === 'failed'}>

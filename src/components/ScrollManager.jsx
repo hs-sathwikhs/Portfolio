@@ -1,45 +1,45 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-/**
- * React Router does not act on the hash. Without this, `/#work` from the
- * projects page lands you at the top of the home page with a fragment in the
- * URL and no explanation - which is exactly what the previous site did.
- *
- * Two rules: a new route starts at the top, and a hash goes to its section
- * once that section has actually mounted.
- */
 export default function ScrollManager() {
   const { pathname, hash, key } = useLocation();
-  const lastPath = useRef(pathname);
-
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (hash) {
-      // Two frames: one for the route to commit, one for layout to settle.
-      let inner = 0;
-      const outer = requestAnimationFrame(() => {
-        inner = requestAnimationFrame(() => {
-          const target = document.getElementById(hash.slice(1));
-          if (target) {
-            target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-          }
+    let frame;
+    let timeout;
+    let observer;
+    const goToSection = () => {
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return false;
+      observer?.disconnect();
+      clearTimeout(timeout);
+      frame = requestAnimationFrame(() => {
+        target.scrollIntoView({
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+          block: 'start',
         });
+        target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
       });
-      lastPath.current = pathname;
-      return () => {
-        cancelAnimationFrame(outer);
-        cancelAnimationFrame(inner);
-      };
+      return true;
+    };
+    if (hash) {
+      if (!goToSection()) {
+        // A deep link can request a section before its presentation mounts.
+        observer = new MutationObserver(goToSection);
+        observer.observe(document.getElementById('main'), { childList: true, subtree: true });
+        timeout = setTimeout(() => observer.disconnect(), 2500);
+      }
+    } else {
+      frame = requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.getElementById('main')?.focus({ preventScroll: true });
+      });
     }
-
-    if (lastPath.current !== pathname) {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      lastPath.current = pathname;
-    }
-    return undefined;
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+      observer?.disconnect();
+    };
   }, [pathname, hash, key]);
-
   return null;
 }

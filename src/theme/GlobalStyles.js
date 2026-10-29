@@ -172,6 +172,23 @@ const GlobalStyles = createGlobalStyle`
       stroke ${(p) => p.theme.dur.theme} linear !important;
   }
 
+  ::view-transition { pointer-events: none; }
+  ::view-transition-group(root) { animation-duration: 600ms; }
+  ::view-transition-group(site-header) { animation-duration: 450ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(root) { animation: page-leave 260ms ease both; }
+  ::view-transition-new(root) { animation: page-arrive 580ms var(--ease-out) both; }
+  [data-transition='presentation']::view-transition-old(root) { animation: presentation-leave 560ms var(--ease-out) both; }
+  [data-transition='presentation']::view-transition-new(root) { animation: presentation-arrive 700ms var(--ease-out) both; }
+  [data-transition='theme']::view-transition-old(root) { animation: none; }
+  [data-transition='theme']::view-transition-new(root) { animation: light-arrive 600ms var(--ease-out) both; }
+  @keyframes page-leave { to { opacity: 0; transform: translateY(-22px); } }
+  @keyframes page-arrive { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+  @keyframes presentation-leave { to { opacity: 0; transform: scale(0.975); } }
+  @keyframes presentation-arrive { from { clip-path: inset(0 0 100% 0); transform: translateY(36px); } to { clip-path: inset(0); transform: none; } }
+  @keyframes light-arrive { from { clip-path: circle(0% at 94% 5%); } to { clip-path: circle(145% at 94% 5%); } }
+  [data-presentation='personal'] h1, [data-presentation='personal'] h2, [data-presentation='personal'] h3 { letter-spacing: -0.045em; }
+  [data-presentation='personal'] main > div { isolation: isolate; }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
 

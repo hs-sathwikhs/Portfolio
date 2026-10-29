@@ -84,6 +84,8 @@ const Figure = styled.figure`
   border: 1px solid ${(p) => p.theme.ruleStrong};
   background: ${(p) => p.theme.paper2};
   padding: clamp(1rem, 3vw, 2.25rem);
+  svg { max-height: 390px; }
+  [data-presentation="personal"] & { border-color: ${(p) => p.theme.rule}; border-radius: 16px; }
 
   figcaption {
     margin-top: 1rem;
@@ -244,7 +246,7 @@ const Missing = styled.section`
   }
 `;
 
-const LABELS = { source: 'Source', live: 'Live site' };
+const LABELS = { source: 'Source', live: 'Live site', evidence: 'Published evidence' };
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -273,7 +275,7 @@ export default function ProjectDetail() {
   const next = at < projects.length - 1 ? projects[at + 1] : null;
 
   return (
-    <Shell>
+    <Shell id="project-record" data-reading-section>
       <Head>
         <Back to="/projects">All projects</Back>
         <Title>{project.title}</Title>
@@ -301,7 +303,7 @@ export default function ProjectDetail() {
       <Reveal>
         <Figure>
           <Diagram kind={project.diagram} />
-          <figcaption>How it is put together, drawn rather than described.</figcaption>
+          <figcaption>System overview. Implementation details and scope are described below.</figcaption>
         </Figure>
       </Reveal>
 
@@ -335,7 +337,7 @@ export default function ProjectDetail() {
           {project.caveat ? (
             <Reveal>
               <Stated>
-                <h2>What it doesn’t do yet</h2>
+                <h2>Scope & limits</h2>
                 <p>{project.caveat}</p>
               </Stated>
             </Reveal>
@@ -343,7 +345,7 @@ export default function ProjectDetail() {
 
           <Reveal>
             <Block>
-              <h2>The problem, and what it cost</h2>
+              <h2>The engineering trade-off</h2>
               <Prose>
                 <p>{project.problem}</p>
               </Prose>

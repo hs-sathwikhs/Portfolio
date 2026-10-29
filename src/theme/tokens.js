@@ -152,3 +152,33 @@ export const browserChrome = {
   paper: paperTheme.paper,
   trace: traceTheme.paper,
 };
+
+
+// Personal keeps the same contrast roles with a cooler, cinematic material palette.
+const personalBase = {
+  personal: true,
+  font: { ...font, display: font.body },
+  displayWeight: 500,
+  displayWeightBold: 650,
+  maxw: '1320px',
+  space: { ...space, section: 'clamp(4.5rem, 10vw, 8rem)', gutter: 'clamp(1.25rem, 5vw, 3.5rem)' },
+};
+export const personalThemes = {
+  trace: {
+    ...traceTheme, ...personalBase,
+    paper: '#0B0D10', paper2: '#13171D', paperInk: '#1B2028',
+    ink: '#EFF1F4', graphite: '#A4ACB9', rule: '#292F38', ruleStrong: '#626D7E',
+    seal: '#DDB08D', sealInk: '#17110D', sealWash: 'rgba(221,176,141,0.10)',
+    shadow: 'rgba(0,0,0,0.4)', shadowDeep: 'rgba(0,0,0,0.7)',
+    grain: 'rgba(233,234,236,0.008)',
+    diagram: { stroke: '#CDD5E1', dim: '#97A6BC', fill: '#13171D', node: '#1B2028', live: '#DDB08D' },
+  },
+  paper: {
+    ...paperTheme, ...personalBase,
+    paper: '#F0F1F3', paper2: '#E6E9EE', paperInk: '#FAFBFC',
+    ink: '#181D26', graphite: '#566171', rule: '#C9CED6', ruleStrong: '#7C8797',
+    seal: '#7D452F', sealInk: '#FAF5EF', sealWash: 'rgba(125,69,47,0.07)',
+    grain: 'rgba(16,19,23,0.009)',
+    diagram: { stroke: '#293748', dim: '#586C84', fill: '#E6E9EE', node: '#FAFBFC', live: '#7D452F' },
+  },
+};

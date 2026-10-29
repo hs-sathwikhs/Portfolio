@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Sathwik HS - Security &amp; systems</title>
+    <title>Sathwik HS - Cybersecurity &amp; systems</title>
     <meta
       name="description"
-      content="Sathwik HS builds systems and takes them apart: a RAFT consensus cluster, a terrain classifier trained on a robot's own gait, a firewalled bank topology, on-chain credentials. CSE undergrad at PES University, CTF team co-founder, in Bengaluru."
+      content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities."
     />
     <meta name="author" content="Sathwik HS" />
     <link rel="canonical" href="https://sathwikhs.vercel.app/" />
@@ -18,10 +18,10 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sathwik HS" />
-    <meta property="og:title" content="Sathwik HS - Security &amp; systems" />
+    <meta property="og:title" content="Sathwik HS - Cybersecurity &amp; systems" />
     <meta
       property="og:description"
-      content="A record of work: a RAFT cluster that keeps its log, gait telemetry classified into terrain, a CoAP-to-MQTT bridge in C, credentials nobody can forge - and the capture-the-flag practice alongside it."
+      content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities."
     />
     <meta property="og:url" content="https://sathwikhs.vercel.app/" />
     <meta property="og:image" content="https://sathwikhs.vercel.app/og.jpg" />
@@ -40,41 +40,35 @@
     -->
     <script>
       (function () {
+        var stored, personalMode, presentation;
         try {
-          var stored = localStorage.getItem('sathwikhs.mode');
-          var mode =
-            stored === 'paper' || stored === 'trace'
-              ? stored
-              : window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'trace'
-                : 'paper';
-          var root = document.documentElement;
-          root.dataset.theme = mode;
-          root.style.colorScheme = mode === 'trace' ? 'dark' : 'light';
-          root.style.background = mode === 'trace' ? '#0E0F11' : '#E7E8EA';
-          var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', mode === 'trace' ? '#0E0F11' : '#E7E8EA');
-        } catch (e) {
-          /* Storage blocked. The light palette is the default and is correct. */
-        }
+          stored = localStorage.getItem('sathwikhs.mode');
+          personalMode = localStorage.getItem('sathwikhs.personal.mode');
+          presentation = localStorage.getItem('sathwikhs.presentation');
+        } catch (e) {}
+        presentation = location.hash === '#personal' || presentation === 'personal' ? 'personal' : 'professional';
+        var mode = presentation === 'personal'
+          ? (personalMode === 'paper' ? 'paper' : 'trace')
+          : (stored === 'paper' || stored === 'trace' ? stored : matchMedia('(prefers-color-scheme: dark)').matches ? 'trace' : 'paper');
+        var color = presentation === 'personal' ? (mode === 'trace' ? '#0B0D10' : '#F0F1F3') : (mode === 'trace' ? '#0E0F11' : '#E7E8EA');
+        var root = document.documentElement;
+        root.dataset.theme = mode;
+        root.dataset.presentation = presentation;
+        root.style.colorScheme = mode === 'trace' ? 'dark' : 'light';
+        root.style.background = color;
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', color);
       })();
     </script>
 
-    <!--
-      Kept in step with src/data - and with the same honesty rule. `worksFor` is
-      absent because the C-ISFCR internship ended in July 2025 and that property
-      asserts a present employer; the internship is stated in the record on the
-      page, with its dates, where it can be read as past tense.
-    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Sathwik HS",
         "url": "https://sathwikhs.vercel.app/",
-        "jobTitle": "Computer Science undergraduate",
+        "jobTitle": "Technical Intern",
+        "worksFor": { "@type": "Organization", "name": "Noventiq India" },
         "affiliation": { "@type": "CollegeOrUniversity", "name": "PES University" },
-        "alumniOf": { "@type": "CollegeOrUniversity", "name": "PES University" },
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Bengaluru",
@@ -87,8 +81,8 @@
           "Distributed systems",
           "Computer networks",
           "Socket programming",
-          "Machine learning",
-          "Full-stack web development",
+          "Cloud security",
+          "Application security",
           "Blockchain"
         ],
         "sameAs": [
@@ -102,9 +96,10 @@
   <body>
     <div id="root"></div>
     <noscript>
-      This site renders its content with JavaScript. With it disabled, the record is still readable
-      at <a href="https://github.com/hs-sathwikhs/Portfolio">github.com/hs-sathwikhs/Portfolio</a>,
-      or write to <a href="mailto:hs.sathwikhs@gmail.com">hs.sathwikhs@gmail.com</a>.
+      <h1>Sathwik HS · Cybersecurity &amp; systems</h1>
+      <p>Technical Intern at Noventiq India and CSE undergraduate at PES University. Focused on network/cloud security, application security and pentesting.</p>
+      <p>Seeking January–June 2027 internships and full-time opportunities.</p>
+      <p><a href="/resume.pdf">Read my résumé</a> · <a href="mailto:hs.sathwikhs@gmail.com">Contact me</a> · <a href="https://github.com/hs-sathwikhs">GitHub</a></p>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

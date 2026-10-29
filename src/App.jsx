@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
+import { useLayoutEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import styled from 'styled-components';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
 import ScrollManager from './components/ScrollManager';
+import RouteMeta from './components/RouteMeta';
+import RouteTransitions from './components/RouteTransitions';
 import Home from './pages/Home';
 import AllProjects from './pages/AllProjects';
 import ProjectDetail from './pages/ProjectDetail';
@@ -15,23 +17,17 @@ const Main = styled.main`
   min-height: 60vh;
 `;
 
-/**
- * Route change is a cut, not a scene change: opacity only, fast enough that it
- * reads as the page arriving rather than as an animation you have to sit
- * through.
- */
 function Page({ children }) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: reduce ? 0.12 : 0.22, ease: [0.23, 1, 0.32, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    if (document.documentElement.dataset.transition || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const animation = ref.current.animate(
+      [{ opacity: 0, transform: 'translateY(22px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 480, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+    );
+    return () => animation.cancel();
+  }, []);
+  return <div ref={ref}>{children}</div>;
 }
 
 Page.propTypes = {
@@ -43,10 +39,12 @@ function Shell() {
 
   return (
     <>
+      <RouteMeta />
+      <RouteTransitions />
       <Nav />
       <ScrollManager />
-      <Main id="main">
-        <AnimatePresence mode="wait" initial={false}>
+      <Main id="main" tabIndex={-1}>
+
           <Routes location={location} key={location.pathname}>
             <Route
               path="/"
@@ -88,7 +86,7 @@ function Shell() {
               }
             />
           </Routes>
-        </AnimatePresence>
+
       </Main>
       <Footer />
     </>
