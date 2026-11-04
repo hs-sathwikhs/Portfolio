@@ -13,6 +13,7 @@ import {
 } from '../components/ui/Primitives';
 import Reveal from '../components/ui/Reveal';
 import Diagram from '../components/Diagram';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { projects, findProject } from '../data/projects';
 
 /**
@@ -26,32 +27,6 @@ import { projects, findProject } from '../data/projects';
 
 const Head = styled.header`
   padding-block: clamp(6.5rem, 15vh, 9rem) 0;
-`;
-
-const Back = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: ${(p) => p.theme.font.mono};
-  font-size: ${(p) => p.theme.type.label};
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: ${(p) => p.theme.graphite};
-  text-decoration: none;
-  transition: color var(--dur-hover) var(--ease-out);
-
-  &::before {
-    content: '';
-    width: 1.1rem;
-    height: 1px;
-    background: currentColor;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      color: ${(p) => p.theme.seal};
-    }
-  }
 `;
 
 const Title = styled.h1`
@@ -277,7 +252,7 @@ export default function ProjectDetail() {
   return (
     <Shell id="project-record" data-reading-section>
       <Head>
-        <Back to="/projects">All projects</Back>
+        <Breadcrumbs />
         <Title>{project.title}</Title>
         <Summary>{project.summary}</Summary>
 

@@ -4,6 +4,7 @@ import { Shell, Meta, Quiet } from './ui/Primitives';
 import { profile } from '../data/profile';
 import { useMode } from '../theme/ThemeContext';
 import SignatureMark from './art/Signature';
+import { CookieSettingsButton } from './CookiePreferences';
 
 /**
  * A colophon, not a link farm. Three columns of real information - where the
@@ -174,6 +175,7 @@ export default function Footer() {
         <Rule />
 
         <Base>
+          <CookieSettingsButton />
           <Meta>
             © {year} {profile.name}
           </Meta>

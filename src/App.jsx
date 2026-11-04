@@ -11,6 +11,7 @@ import Home from './pages/Home';
 import AllProjects from './pages/AllProjects';
 import ProjectDetail from './pages/ProjectDetail';
 import NotFound from './pages/NotFound';
+import { CookiePreferencesProvider } from './components/CookiePreferences';
 
 const Main = styled.main`
   display: block;
@@ -96,7 +97,7 @@ function Shell() {
 export default function App() {
   return (
     <Router>
-      <Shell />
+      <CookiePreferencesProvider><Shell /></CookiePreferencesProvider>
     </Router>
   );
 }

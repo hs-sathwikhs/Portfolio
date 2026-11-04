@@ -4,26 +4,30 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- route-meta:start -->
     <title>Sathwik HS - Cybersecurity &amp; systems</title>
     <meta
       name="description"
       content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities."
     />
-    <meta name="author" content="Sathwik HS" />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://sathwikhs.vercel.app/" />
+    <meta property="og:title" content="Sathwik HS - Cybersecurity &amp; systems" />
+    <meta property="og:description" content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities." />
+    <meta property="og:url" content="https://sathwikhs.vercel.app/" />
+    <meta name="twitter:title" content="Sathwik HS - Cybersecurity &amp; systems" />
+    <meta name="twitter:description" content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities." />
+    <!-- route-meta:end -->
+    <meta name="author" content="Sathwik HS" />
 
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#E7E8EA" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sathwik HS" />
-    <meta property="og:title" content="Sathwik HS - Cybersecurity &amp; systems" />
-    <meta
-      property="og:description"
-      content="Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities."
-    />
-    <meta property="og:url" content="https://sathwikhs.vercel.app/" />
     <meta property="og:image" content="https://sathwikhs.vercel.app/og.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
@@ -31,34 +35,10 @@
     <meta property="og:image:alt" content="Sathwik HS - security and systems, Bengaluru." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@sathwikhss" />
+    <meta name="twitter:image" content="https://sathwikhs.vercel.app/og.jpg" />
+    <meta name="twitter:image:alt" content="Sathwik HS - security and systems, Bengaluru." />
 
-    <!--
-      Paint the colour mode before the first frame. Without this, a visitor who
-      chose TRACE gets one flash of light paper on every reload, which is the
-      one thing a theme toggle must never do. Kept inline and tiny on purpose:
-      it has to run before the stylesheet, so it cannot be a module.
-    -->
-    <script>
-      (function () {
-        var stored, personalMode, presentation;
-        try {
-          stored = localStorage.getItem('sathwikhs.mode');
-          personalMode = localStorage.getItem('sathwikhs.personal.mode');
-          presentation = localStorage.getItem('sathwikhs.presentation');
-        } catch (e) {}
-        presentation = location.hash === '#personal' || presentation === 'personal' ? 'personal' : 'professional';
-        var mode = presentation === 'personal'
-          ? (personalMode === 'paper' ? 'paper' : 'trace')
-          : (stored === 'paper' || stored === 'trace' ? stored : matchMedia('(prefers-color-scheme: dark)').matches ? 'trace' : 'paper');
-        var color = presentation === 'personal' ? (mode === 'trace' ? '#0B0D10' : '#F0F1F3') : (mode === 'trace' ? '#0E0F11' : '#E7E8EA');
-        var root = document.documentElement;
-        root.dataset.theme = mode;
-        root.dataset.presentation = presentation;
-        root.style.colorScheme = mode === 'trace' ? 'dark' : 'light';
-        root.style.background = color;
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', color);
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
 
     <script type="application/ld+json">
       {

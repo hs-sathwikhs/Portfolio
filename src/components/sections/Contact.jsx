@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Shell, Band, Meta, Opener, ActionButton, Quiet } from '../ui/Primitives';
 import Reveal from '../ui/Reveal';
 import { profile } from '../../data/profile';
 import { useMode } from '../../theme/ThemeContext';
 import Signature from '../art/Signature';
+import { useToast } from '../ui/Toast';
+import { trackConversion } from '../../lib/analytics';
 
 /**
  * A form that actually sends.
@@ -194,12 +196,24 @@ function validate(values) {
 }
 
 export default function Contact() {
+  const notify = useToast();
   const { presentation } = useMode();
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [state, setState] = useState('idle'); // idle | sending | sent | handoff | failed
   const [copied, setCopied] = useState(false);
   const sentTo = useRef('');
+  const copyTimer = useRef(null);
+  const mounted = useRef(false);
+  const receipt = useRef(null);
+  const submitting = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; clearTimeout(copyTimer.current); };
+  }, []);
+  useEffect(() => {
+    if (state === 'sent' || state === 'handoff') receipt.current?.focus({ preventScroll: true });
+  }, [state]);
 
   const update = (event) => {
     const { name, value } = event.target;
@@ -212,12 +226,16 @@ export default function Contact() {
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(profile.email);
+      if (!mounted.current) return;
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2200);
+      notify('Email address copied.');
+      trackConversion('email_copy');
+      clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopied(false), 2200);
     } catch {
-      // No clipboard permission. The address is on screen already, so this is
-      // a convenience that failed rather than a feature that broke.
+      if (!mounted.current) return;
       setCopied(false);
+      notify('Could not copy the address. Select it above and copy it manually.', true);
     }
   };
 
@@ -228,10 +246,12 @@ export default function Contact() {
       subject,
     )}&body=${encodeURIComponent(body)}`;
     setState('handoff');
+    trackConversion('email_draft_open');
   };
 
   const submit = async (event) => {
     event.preventDefault();
+    if (submitting.current) return;
 
     const found = validate(values);
     setErrors(found);
@@ -249,6 +269,7 @@ export default function Contact() {
     }
 
     setState('sending');
+    submitting.current = true;
     try {
       // Loaded on submit so the SDK is not part of first paint.
       const { default: emailjs } = await import('@emailjs/browser');
@@ -263,10 +284,14 @@ export default function Contact() {
         },
         { publicKey: KEYS.publicKey },
       );
+      if (!mounted.current) return;
       setValues(EMPTY);
       setState('sent');
+      trackConversion('generate_lead');
     } catch {
-      setState('failed');
+      if (mounted.current) setState('failed');
+    } finally {
+      submitting.current = false;
     }
   };
 
@@ -294,9 +319,6 @@ export default function Contact() {
                     <Copy type="button" onClick={copyEmail}>
                       {copied ? 'Copied' : 'Copy'}
                     </Copy>
-                    <span className="sr-only" role="status" aria-live="polite">
-                      {copied ? 'Email address copied to clipboard' : ''}
-                    </span>
                   </Addressed>
                 </div>
                 <div>
@@ -325,9 +347,9 @@ export default function Contact() {
 
           <Reveal delay={0.06}>
             {state === 'sent' || state === 'handoff' ? (
-              <Receipt>
+              <Receipt ref={receipt} tabIndex={-1} role="region" aria-labelledby="contact-receipt-title">
                 <Meta $seal>{state === 'sent' ? 'Sent' : 'Handed to your mail client'}</Meta>
-                <h3>
+                <h3 id="contact-receipt-title">
                   {state === 'sent'
                     ? 'The message is through.'
                     : 'Your mail app should be open now.'}

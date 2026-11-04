@@ -1,9 +1,10 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Shell, Meta, SectionRule, TagRow, Tag } from '../components/ui/Primitives';
+import { Shell, Meta, SectionRule, TagRow, Tag, ActionButton } from '../components/ui/Primitives';
 import Reveal from '../components/ui/Reveal';
 import Diagram from '../components/Diagram';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { projects, domains, featured } from '../data/projects';
 
 /**
@@ -85,6 +86,14 @@ const Row = styled.li`
   &:last-child {
     border-bottom: 1px solid ${(p) => p.theme.ruleStrong};
   }
+`;
+
+const Empty = styled.li`
+  padding-block: 2.5rem;
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  p { color: ${(p) => p.theme.graphite}; }
 `;
 
 const Entry = styled(Link)`
@@ -171,6 +180,7 @@ export default function AllProjects() {
   return (
     <Shell>
       <Head>
+        <Breadcrumbs />
         <h1>The project index.</h1>
         <p>
           {projects.length} projects across security, systems, applied ML, web and on-chain work.
@@ -200,6 +210,13 @@ export default function AllProjects() {
       </Head>
 
       <Rows ref={rows}>
+        {shown.length === 0 && (
+          <Empty>
+            <h2>No projects here yet.</h2>
+            <p>{domain === 'All' ? 'New work will appear here when it is ready.' : `There are no projects in ${domain} yet.`}</p>
+            {domain !== 'All' && <ActionButton type="button" onClick={() => setDomain('All')}>Show all projects</ActionButton>}
+          </Empty>
+        )}
         {shown.map((project, i) => (
           <Row key={project.id}>
             <Reveal delay={Math.min(i, 3) * 0.05}>

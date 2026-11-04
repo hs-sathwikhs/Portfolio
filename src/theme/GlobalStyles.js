@@ -192,11 +192,11 @@ const GlobalStyles = createGlobalStyle`
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
 
-    /* Gentler, not absent: colour and opacity still resolve, just quickly. */
+    /* Disable CSS movement too, including the nav slider and theme icon. */
     *, *::before, *::after {
-      transition-duration: 120ms !important;
-      animation-duration: 1ms !important;
-      animation-iteration-count: 1 !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+      animation: none !important;
     }
   }
 `;

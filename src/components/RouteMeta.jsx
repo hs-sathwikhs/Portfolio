@@ -1,22 +1,50 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { findProject } from '../data/projects';
+import { getPageMeta, getBreadcrumbSchema } from '../data/seo';
 
-const BASE = 'https://sathwikhs.vercel.app';
-const DESCRIPTION = 'Sathwik HS, cybersecurity enthusiast and Technical Intern at Noventiq India. Network/cloud security, AppSec and pentesting. Seeking Jan–Jun 2027 internships and full-time opportunities.';
+function updateMeta(attribute, key, content) {
+  let node = document.querySelector(`meta[${attribute}="${key}"]`);
+  if (content === null) { node?.remove(); return; }
+  if (!node) {
+    node = document.createElement('meta');
+    node.setAttribute(attribute, key);
+    document.head.append(node);
+  }
+  node.setAttribute('content', content);
+}
+
 export default function RouteMeta() {
   const { pathname } = useLocation();
   useEffect(() => {
-    const project = pathname.startsWith('/project/') ? findProject(pathname.slice(9)) : null;
-    const title = project ? `${project.title} · Sathwik HS` : pathname === '/projects' ? 'Projects · Sathwik HS' : 'Sathwik HS - Cybersecurity & systems';
-    const description = project?.summary || DESCRIPTION;
-    const canonical = project ? `${BASE}/project/${project.slug}` : `${BASE}${pathname}`;
-    document.title = title;
-    document.querySelector('meta[name="description"]')?.setAttribute('content', description);
-    document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
-    document.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', canonical);
-    document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical);
+    const meta = getPageMeta(pathname);
+    document.title = meta.title;
+    updateMeta('name', 'description', meta.description);
+    updateMeta('name', 'robots', meta.found ? 'index, follow' : 'noindex, follow');
+    updateMeta('property', 'og:title', meta.title);
+    updateMeta('property', 'og:description', meta.description);
+    updateMeta('property', 'og:url', meta.canonical);
+    updateMeta('name', 'twitter:title', meta.title);
+    updateMeta('name', 'twitter:description', meta.description);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (meta.canonical) {
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        document.head.append(canonical);
+      }
+      canonical.href = meta.canonical;
+    } else canonical?.remove();
+    const schema = getBreadcrumbSchema(pathname);
+    let script = document.getElementById('breadcrumb-schema');
+    if (schema) {
+      if (!script) {
+        script = document.createElement('script');
+        script.id = 'breadcrumb-schema';
+        script.type = 'application/ld+json';
+        document.head.append(script);
+      }
+      script.textContent = JSON.stringify(schema).replace(/</g, '\\u003c');
+    } else script?.remove();
   }, [pathname]);
   return null;
 }
