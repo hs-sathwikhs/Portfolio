@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
-import { profile } from '../../data/profile';
+import { profile, credentials } from '../../data/profile';
 import { Shell, Action, Quiet } from '../ui/Primitives';
 import Availability from '../ui/Availability';
 import ResonanceField from '../art/ResonanceField';
@@ -50,18 +50,31 @@ const Actions = styled.div`
   @media (max-width: 380px) { gap: .5rem; a { padding-inline: .85rem; font-size: .82rem; } }
 `;
 const Foot = styled.div`
-  position: relative; z-index: 2; display: flex; align-items: center; flex-wrap: wrap;
-  justify-content: space-between; gap: 1.25rem; padding: 1.5rem 0 2rem;
+  position: relative; z-index: 2; display: grid; align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 1.5rem 2.5rem; padding: 1.5rem 0 2rem;
   font-size: .77rem; color: ${(p) => p.theme.graphite};
   .current { display: grid; gap: .35rem; }
   .current b { color: ${(p) => p.theme.ink}; font-weight: 450; font-size: .88rem; }
-  .marks { display: flex; align-items: center; gap: 1.5rem; }
+  .certifications { display: grid; gap: .35rem; min-width: 0; }
+  .marks { display: flex; align-items: center; align-self: center; gap: 1.5rem; }
   .wave { display: flex; align-items: center; gap: 3px; height: 25px; }
   .wave i { width: 2px; height: 20px; background: ${(p) => p.theme.seal}; transform-origin: center; animation: ${play} 1.2s ease-in-out 3; }
   .wave i:nth-child(2n) { height: 13px; animation-delay: -.3s; }
   .wave i:nth-child(3n) { height: 25px; animation-delay: -.8s; }
   .mark { width: 32px; height: 32px; color: ${(p) => p.theme.graphite}; }
-  @media (max-width: 760px) { .mark { display: none; } }
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    .certifications { grid-column: 1 / -1; grid-row: 2; }
+  }
+  @media (max-width: 760px) { column-gap: 1rem; .mark { display: none; } }
+`;
+const CredentialLinks = styled.ul`
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem;
+  a { display: grid; align-content: start; gap: .25rem; min-height: 44px; text-decoration: none; }
+  strong { color: ${(p) => p.theme.ink}; font-size: .88rem; font-weight: 500; transition: color var(--dur-hover) var(--ease-out); }
+  small { font-size: .76rem; color: ${(p) => p.theme.graphite}; }
+  a:hover strong, a:focus-visible strong { color: ${(p) => p.theme.seal}; }
 `;
 export default function PersonalHero() {
   const ref = useRef(null);
@@ -88,6 +101,17 @@ export default function PersonalHero() {
       </Photograph>
       <Foot>
         <div className="current"><span>Currently</span><b><Quiet as={Link} to="/#record">Technical Intern · Noventiq India ↗</Quiet></b></div>
+        <div className="certifications" role="group" aria-labelledby="personal-certifications-label">
+          <span id="personal-certifications-label">Certifications</span>
+          <CredentialLinks>
+            {credentials.map((item) => <li key={item.name}>
+              <a href={item.href} target="_blank" rel="noopener noreferrer">
+                <strong>{item.name} <span aria-hidden="true">↗</span></strong>
+                <small>{item.detail}</small>
+              </a>
+            </li>)}
+          </CredentialLinks>
+        </div>
         <div className="marks" aria-hidden="true"><span className="wave">{Array.from({ length: 7 }, (_, i) => <i key={i} />)}</span><Signature kind="damaru" className="mark" /></div>
       </Foot>
     </Shell>
